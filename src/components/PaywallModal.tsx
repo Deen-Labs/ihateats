@@ -153,7 +153,8 @@ export default function PaywallModal({ isOpen, onClose, onSuccess }: PaywallModa
       }
 
       // 2. Open Razorpay Checkout Dialog
-      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_5123456789";
+      const rawKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "";
+      const razorpayKey = rawKey.replace(/^[^=]+=\s*/, "").replace(/^["']|["']$/g, "").trim() || "rzp_test_5123456789";
 
       const options = {
         key: razorpayKey,

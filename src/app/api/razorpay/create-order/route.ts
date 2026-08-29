@@ -1,12 +1,20 @@
 import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
 
+function cleanKey(val?: string): string {
+  if (!val) return "";
+  return val.replace(/^[^=]+=\s*/, "").replace(/^["']|["']$/g, "").trim();
+}
+
 export async function POST(req: Request) {
   try {
     const { planId, amount } = await req.json();
 
-    const keyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
-    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    const rawKeyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+    const rawKeySecret = process.env.RAZORPAY_KEY_SECRET;
+
+    const keyId = cleanKey(rawKeyId);
+    const keySecret = cleanKey(rawKeySecret);
 
     if (!keyId || !keySecret) {
       // Return sandbox order ID for immediate testing if Razorpay keys aren't added yet
