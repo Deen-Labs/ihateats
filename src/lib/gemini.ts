@@ -116,8 +116,15 @@ function getApiKey(): string {
     process.env.GEMINI_API_KEY_1,
     process.env.GEMINI_API_KEY_2,
     process.env.GEMINI_API_KEY_3,
-    process.env.GEMINI_API_KEY_4,
-    process.env.GEMINI_API_KEY_5,
+    process.env.Key1,
+    process.env.Key2,
+    process.env.Key3,
+    process.env.KEY1,
+    process.env.KEY2,
+    process.env.KEY3,
+    process.env.key1,
+    process.env.key2,
+    process.env.key3,
   ].filter(Boolean) as string[];
 
   if (keys.length === 0) {
