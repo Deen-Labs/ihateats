@@ -110,16 +110,29 @@ const JSON_TEMPLATE = `{
   }
 }`;
 
+function getApiKey(): string {
+  const keys = [
+    process.env.GEMINI_API_KEY,
+    process.env.GEMINI_API_KEY_1,
+    process.env.GEMINI_API_KEY_2,
+    process.env.GEMINI_API_KEY_3,
+    process.env.GEMINI_API_KEY_4,
+    process.env.GEMINI_API_KEY_5,
+  ].filter(Boolean) as string[];
+
+  if (keys.length === 0) {
+    throw new Error("GEMINI_API_KEY environment variable is not set.");
+  }
+
+  return keys[Math.floor(Math.random() * keys.length)];
+}
+
 export async function generateResume(
   rawText: string,
   jobDescription?: string,
   targetPages: number = 1
 ): Promise<ResumeData> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error("GEMINI_API_KEY environment variable is not set.");
-  }
-
+  const apiKey = getApiKey();
   const ai = new GoogleGenAI({ apiKey });
   const prompt = buildPrompt(rawText, jobDescription, targetPages);
 
