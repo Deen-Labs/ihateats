@@ -6,16 +6,25 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:regression": "node scripts/test-regression.mjs"
   },
   "dependencies": {
+    "@google/genai": "^2.15.0",
+    "framer-motion": "^12.43.0",
+    "lucide-react": "^1.28.0",
     "next": "16.3.0",
+    "pdf-parse": "^1.1.1",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "react-to-print": "^3.3.0",
+    "zod": "^4.4.3",
+    "zod-to-json-schema": "^3.25.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
