@@ -197,6 +197,8 @@ export default function PaywallModal({ isOpen, onClose, onSuccess }: PaywallModa
 
       if (window.Razorpay) {
         const rzp = new window.Razorpay(options);
+        setIsProcessing(false);
+        onClose(); // Hide paywall modal so Razorpay iframe is cleanly focused uncropped
         rzp.open();
       } else {
         // Fallback sandbox activation if Razorpay checkout script isn't loaded
