@@ -11,6 +11,9 @@ import ResumePreview from "@/components/ResumePreview";
 import ResumeEditor from "@/components/ResumeEditor";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import PDFExport from "@/components/PDFExport";
+import QuotaBadge from "@/components/QuotaBadge";
+import PaywallModal from "@/components/PaywallModal";
+import { getQuotaState, consumeCredit, type QuotaState } from "@/lib/quota";
 
 import { SAMPLE_TECHNICAL_RAW_TEXT, SAMPLE_TECHNICAL_RESUME_DATA } from "@/lib/sampleData";
 import { smoothScrollTo } from "@/lib/smoothScroll";
@@ -45,8 +48,12 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState<string>("contact");
   const [targetPages, setTargetPages] = useState<number>(1);
 
+  const [quota, setQuota] = useState<QuotaState>({ remaining: 2, limit: 2, isPro: false });
+  const [showPaywall, setShowPaywall] = useState<boolean>(false);
+
   useEffect(() => {
     setHistory(loadHistory());
+    setQuota(getQuotaState());
   }, []);
 
   useEffect(() => {
@@ -114,6 +121,12 @@ export default function Home() {
       return;
     }
 
+    const currentQuota = getQuotaState();
+    if (!currentQuota.isPro && currentQuota.remaining <= 0) {
+      setShowPaywall(true);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setResumeData(null);
@@ -133,6 +146,9 @@ export default function Home() {
       const raw = await res.json();
       const data = normalizeResumeData(raw);
       setResumeData(data);
+
+      consumeCredit();
+      setQuota(getQuotaState());
 
       const entry: HistoryEntry = {
         timestamp: new Date().toLocaleString("en-GB", {
@@ -196,7 +212,7 @@ export default function Home() {
         <div className="absolute bottom-[-10%] right-[15%] w-[500px] h-[500px] bg-[#a78bfa] opacity-[0.03] blur-[100px] rounded-full" />
       </div>
 
-      <nav className="relative z-10 glass-card mx-4 sm:mx-6 lg:mx-8 mt-4 px-6 py-4 flex items-center justify-between">
+      <nav className="relative z-10 glass-card mx-4 sm:mx-6 lg:mx-8 mt-4 px-6 py-4 flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-baseline gap-3">
           <span className="text-xl font-bold text-white tracking-tight">
             ResumeLabs
@@ -205,16 +221,18 @@ export default function Home() {
             ATS Resume Builder
           </span>
         </div>
-        <div className="text-sm text-[#94a3b8]">
-          by{" "}
-          <a
-            href="https://deenlabs.tech"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#a78bfa] font-semibold hover:text-white transition-colors"
-          >
-            deenlabs.tech
-          </a>
+
+        <div className="flex items-center gap-3">
+          <QuotaBadge quota={quota} onUpgradeClick={() => setShowPaywall(true)} />
+          {!quota.isPro && (
+            <button
+              onClick={() => setShowPaywall(true)}
+              className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#06b6d4] to-[#7c3aed] text-white text-xs font-bold shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:scale-[1.03] transition-all cursor-pointer flex items-center gap-1.5"
+            >
+              <i className="fa-solid fa-crown text-amber-300 text-xs" />
+              <span>Upgrade to Pro</span>
+            </button>
+          )}
         </div>
       </nav>
 
@@ -426,8 +444,8 @@ export default function Home() {
           </button>
           <HistorySidebar
             history={history}
-            onLoadEntry={(idx) => {
-              handleLoadEntry(idx);
+            onLoadEntry={(i) => {
+              handleLoadEntry(i);
               const el = document.getElementById("mobile-history");
               if (el) el.classList.add("hidden");
             }}
@@ -435,6 +453,12 @@ export default function Home() {
           />
         </div>
       </div>
+
+      <PaywallModal
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        onSuccess={() => setQuota(getQuotaState())}
+      />
     </div>
   );
 }

@@ -92,6 +92,7 @@ export default function RootLayout({
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
           crossOrigin="anonymous"
         />
+        <script src="https://checkout.razorpay.com/v1/checkout.js" async />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
