@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+﻿# 🧪 ResumeLabs
 
-## Getting Started
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![React-PDF](https://img.shields.io/badge/React_PDF-FF4154?style=for-the-badge&logo=react&logoColor=white)
+![Razorpay](https://img.shields.io/badge/Razorpay-02042B?style=for-the-badge&logo=razorpay&logoColor=white)
 
-First, run the development server:
+ResumeLabs is an AI-powered, 100% free ATS resume builder. It takes your rough notes, old resumes, or LinkedIn profiles and transforms them into recruiter-tested, 1-page ATS-optimized resumes instantly. 
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Powered by our proprietary **Lab Engine AI**, it ensures you never get auto-rejected by Applicant Tracking Systems again.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ✨ Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **🎯 Target Job Matcher**: Paste a Job Description and the AI will analyze missing keywords, score your resume, and re-write your bullets to perfectly align with the specific role.
+- **📄 Instant PDF Parsing**: Upload an old PDF resume, and our extractor will pull your data instantly into the editor.
+- **👁️ Live Preview Editor**: Drag-and-drop array reordering, direct text-box editing, and a side-by-side split screen showing exactly how the final PDF looks in real-time.
+- **🚀 One-Click PDF Export**: Generates a mathematically perfect, Jake's Resume style PDF format using @react-pdf/renderer—no LaTeX installation required.
+- **📊 ATS Scoring Dashboard**: Visual gauges and donut charts analyzing your experience breakdown, word counts, and ATS compliance score.
+- **💳 Razorpay Freemium Quotas**: Built-in daily generation quotas with Razorpay integration for unlimited "Pro" access.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS & Framer Motion (for fluid animations)
+- **AI Engine**: Google Gemini API (White-labeled as *Lab Engine*)
+- **Validation**: Zod (for strict JSON schema parsing)
+- **PDF Generation**: @react-pdf/renderer
+- **Monetization**: Razorpay API
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 🚀 Local Development Setup
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Clone the repository:**
+   `ash
+   git clone https://github.com/Deen-Labs/ResumeLabs.git
+   cd resumelabs-web
+   `
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2. **Install dependencies:**
+   `ash
+   npm install
+   `
+
+3. **Set up Environment Variables:**
+   Create a .env.local file in the root directory and add the following:
+   `env
+   # AI Engine Keys (Supports multiple for rotation)
+   GEMINI_API_KEY=your_gemini_key_here
+   GEMINI_API_KEY_1=optional_backup_key_1
+   GEMINI_API_KEY_2=optional_backup_key_2
+   
+   # Razorpay Keys
+   NEXT_PUBLIC_RAZORPAY_KEY_ID=your_razorpay_key_id
+   RAZORPAY_KEY_SECRET=your_razorpay_secret
+   `
+
+4. **Run the development server:**
+   `ash
+   npm run dev
+   `
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 👨‍💻 Developer Mode (Unlimited Generations)
+
+While testing locally or in production, you can bypass the Razorpay paywall and quota limits using **Developer Mode**:
+
+- **Keyboard Shortcut**: Press Ctrl + Shift + D (or Cmd + Shift + D on Mac).
+- **Easter Egg**: Click the "ResumeLabs" logo in the top-left navigation bar **5 times rapidly**.
+
+This will unlock unlimited Lab Engine AI generations for your session.
+
+---
+
+## 📜 License
+
+Designed and Engineered by [Deen Labs](https://github.com/Deen-Labs). All rights reserved.
