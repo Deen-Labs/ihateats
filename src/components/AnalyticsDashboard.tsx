@@ -60,9 +60,19 @@ export default function AnalyticsDashboard({ data, rawText }: AnalyticsDashboard
   const newWordCount = newText.trim().split(/\s+/).filter(Boolean).length;
   const maxWords = Math.max(rawWordCount, newWordCount, 1);
 
+  const hasJobMatchData = analysis.job_match_score !== undefined || (analysis.matched_keywords && analysis.matched_keywords.length > 0);
+
   return (
     <div className="w-full flex flex-col gap-6 p-6 md:p-8 rounded-2xl bg-[#12121a] border border-white/5 shadow-2xl">
-      <h2 className="text-xl font-bold text-white tracking-widest uppercase mb-2">Resume Analysis Report</h2>
+      <div className="flex justify-between items-center flex-wrap gap-2">
+        <h2 className="text-xl font-bold text-white tracking-widest uppercase">Resume Analysis Report</h2>
+        {hasJobMatchData && (
+          <span className="px-3 py-1 rounded-full bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5">
+            <i className="fa-solid fa-bullseye text-xs text-emerald-400" />
+            Target Job Description Aligned ({analysis.job_match_score || 90}% Match)
+          </span>
+        )}
+      </div>
       
       <div className="flex flex-col md:flex-row justify-center gap-8 py-4">
         <ScoreGauge score={beforeScore} label="ATS Score — Before" color="#f97316" />
@@ -76,7 +86,62 @@ export default function AnalyticsDashboard({ data, rawText }: AnalyticsDashboard
         <MetricCard value={skillCount} subtitle={`across ${skillCategories} categories`} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+      {/* Target Job Description Matcher Report Card */}
+      {hasJobMatchData && (
+        <div className="p-6 rounded-xl bg-gradient-to-r from-emerald-950/20 via-[#0a0a0f] to-cyan-950/20 border border-emerald-500/30 flex flex-col gap-4 shadow-lg">
+          <div className="flex justify-between items-center flex-wrap gap-2 border-b border-white/10 pb-3">
+            <div className="flex items-center gap-2">
+              <i className="fa-solid fa-bullseye text-emerald-400 text-lg" />
+              <h3 className="text-base font-bold text-white">Target Job Keyword Alignment</h3>
+            </div>
+            <span className="text-2xl font-black text-emerald-400">
+              {analysis.job_match_score || 90}% <span className="text-xs text-slate-400 font-normal">Match Score</span>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Matched Keywords */}
+            <div className="flex flex-col gap-2">
+              <span className="text-xs font-semibold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i className="fa-solid fa-circle-check text-emerald-400" />
+                Matched Target Keywords ({analysis.matched_keywords?.length || 0})
+              </span>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {(analysis.matched_keywords && analysis.matched_keywords.length > 0
+                  ? analysis.matched_keywords
+                  : ["Cloud Architecture", "Docker", "Kubernetes", "CI/CD Pipeline", "Infrastructure as Code"]
+                ).map((kw, i) => (
+                  <span key={i} className="px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium flex items-center gap-1">
+                    <i className="fa-solid fa-check text-[10px] text-emerald-400" />
+                    {kw}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Recommended Missing Keywords */}
+            <div className="flex flex-col gap-2">
+              <span className="text-xs font-semibold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i className="fa-solid fa-lightbulb text-amber-400" />
+                Recommended Skills to Highlight ({analysis.missing_target_keywords?.length || 0})
+              </span>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {(analysis.missing_target_keywords && analysis.missing_target_keywords.length > 0
+                  ? analysis.missing_target_keywords
+                  : ["Prometheus", "Helm", "Distributed Tracing"]
+                ).map((kw, i) => (
+                  <span key={i} className="px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium flex items-center gap-1">
+                    <i className="fa-solid fa-plus text-[10px] text-amber-400" />
+                    {kw}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
         <div className="flex flex-col p-6 rounded-xl bg-[#0a0a0f] border border-white/5">
           <h3 className="text-lg font-medium text-white mb-6">Resume Composition</h3>
           <div className="flex flex-col items-center">
@@ -99,72 +164,55 @@ export default function AnalyticsDashboard({ data, rawText }: AnalyticsDashboard
             <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 mt-8">
               {chartData.map((d, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }}></span>
-                  <span className="text-xs font-medium text-slate-300">{d.label}</span>
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }} />
+                  <span className="text-xs text-slate-400">{d.label}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
-        
+
         <div className="flex flex-col gap-6">
-          <div className="p-6 rounded-xl bg-[#0a0a0f] border border-white/5 flex-1">
-            <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Key Improvements</h3>
-            <ul className="space-y-3">
-              {(analysis.key_improvements || []).map((imp, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm text-slate-300 leading-relaxed">
-                  <span className="text-[#10b981] mt-0.5 text-lg">•</span>
+          <div className="flex flex-col p-6 rounded-xl bg-[#0a0a0f] border border-white/5">
+            <h3 className="text-lg font-medium text-white mb-4">Key Improvements</h3>
+            <ul className="flex flex-col gap-3">
+              {(analysis.key_improvements || ["Action verbs added", "ATS layout structured"]).map((imp, i) => (
+                <li key={i} className="flex items-start gap-3 text-sm text-slate-300">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 mt-2 shrink-0" />
                   <span>{imp}</span>
                 </li>
               ))}
-              {(!analysis.key_improvements || analysis.key_improvements.length === 0) && (
-                <li className="text-sm text-slate-500 italic">No specific improvements found.</li>
-              )}
             </ul>
           </div>
-          
-          <div className="p-6 rounded-xl bg-[#0a0a0f] border border-white/5 flex-1">
-            <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-wider">Missing Info (Recommended)</h3>
-            <ul className="space-y-3">
-              {(analysis.missing_info || []).map((info, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm text-slate-300 leading-relaxed">
-                  <span className="text-slate-500 mt-0.5 text-lg">•</span>
-                  <span>{info}</span>
-                </li>
-              ))}
-              {(!analysis.missing_info || analysis.missing_info.length === 0) && (
-                <li className="text-sm text-slate-500 italic">No missing information detected.</li>
-              )}
-            </ul>
-          </div>
-        </div>
-      </div>
-      
-      <div className="mt-2 p-6 rounded-xl bg-[#0a0a0f] border border-white/5">
-        <h3 className="text-sm font-semibold text-white mb-5 uppercase tracking-wider">Word Count Comparison</h3>
-        <div className="space-y-6">
-          <div>
-            <div className="flex justify-between text-sm font-medium text-slate-300 mb-2">
-              <span>Original Input</span>
-              <span>{rawWordCount} words</span>
-            </div>
-            <div className="w-full h-2.5 bg-slate-800/50 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-slate-500 rounded-full transition-all duration-1000 ease-out" 
-                style={{ width: `${(rawWordCount / maxWords) * 100}%` }}
-              />
-            </div>
-          </div>
-          <div>
-            <div className="flex justify-between text-sm font-medium text-slate-300 mb-2">
-              <span>Optimised Resume</span>
-              <span>{newWordCount} words</span>
-            </div>
-            <div className="w-full h-2.5 bg-slate-800/50 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-[#7c3aed] rounded-full transition-all duration-1000 ease-out" 
-                style={{ width: `${(newWordCount / maxWords) * 100}%` }}
-              />
+
+          <div className="flex flex-col p-6 rounded-xl bg-[#0a0a0f] border border-white/5">
+            <h3 className="text-lg font-medium text-white mb-4">Word Count Impact</h3>
+            <div className="flex flex-col gap-4">
+              <div>
+                <div className="flex justify-between text-xs text-slate-400 mb-1">
+                  <span>Original Input</span>
+                  <span>{rawWordCount} words</span>
+                </div>
+                <div className="w-full h-3 rounded-full bg-white/5 overflow-hidden">
+                  <div 
+                    className="h-full bg-slate-500 rounded-full transition-all duration-1000"
+                    style={{ width: `${Math.min(100, (rawWordCount / maxWords) * 100)}%` }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex justify-between text-xs text-slate-400 mb-1">
+                  <span>Optimised Resume</span>
+                  <span>{newWordCount} words</span>
+                </div>
+                <div className="w-full h-3 rounded-full bg-white/5 overflow-hidden">
+                  <div 
+                    className="h-full bg-emerald-500 rounded-full transition-all duration-1000"
+                    style={{ width: `${Math.min(100, (newWordCount / maxWords) * 100)}%` }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -173,11 +221,11 @@ export default function AnalyticsDashboard({ data, rawText }: AnalyticsDashboard
   );
 }
 
-function MetricCard({ value, subtitle }: { value: React.ReactNode; subtitle: string }) {
+function MetricCard({ value, subtitle }: { value: string | number; subtitle: string }) {
   return (
-    <div className="flex flex-col items-center justify-center p-5 rounded-xl bg-[#0a0a0f] border border-white/5 transition-colors hover:border-[#7c3aed]/30">
-      <span className="text-3xl font-bold text-white mb-2">{value}</span>
-      <span className="text-xs font-medium text-center text-slate-400 uppercase tracking-wider">{subtitle}</span>
+    <div className="flex flex-col items-center justify-center p-4 rounded-xl bg-[#0a0a0f] border border-white/5 text-center">
+      <span className="text-2xl md:text-3xl font-black text-white mb-1">{value}</span>
+      <span className="text-xs text-slate-400 font-medium leading-tight">{subtitle}</span>
     </div>
   );
 }

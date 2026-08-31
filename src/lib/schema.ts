@@ -43,6 +43,9 @@ export const AnalysisDetailsSchema = z.object({
   action_verbs_count: z.number().describe("Count of strong action verbs introduced."),
   key_improvements: z.array(z.string()).describe("List of key improvements made by the AI (max 5 items)."),
   missing_info: z.array(z.string()).describe("Details that were missing from input which would improve ATS score."),
+  job_match_score: z.number().optional().describe("Match percentage against target job description (0-100%)."),
+  matched_keywords: z.array(z.string()).optional().describe("Top keywords successfully matched from target job posting."),
+  missing_target_keywords: z.array(z.string()).optional().describe("High-value target job keywords candidate should consider adding."),
 });
 
 export const ResumeSchema = z.object({

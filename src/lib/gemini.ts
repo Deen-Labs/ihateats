@@ -106,7 +106,10 @@ const JSON_TEMPLATE = `{
     "achievements_quantified": 3,
     "action_verbs_count": 10,
     "key_improvements": ["Upgraded weak verbs", "Formatted ATS structure"],
-    "missing_info": ["Consider adding portfolio link"]
+    "missing_info": ["Consider adding portfolio link"],
+    "job_match_score": 88,
+    "matched_keywords": ["Docker", "Kubernetes", "Terraform", "CI/CD"],
+    "missing_target_keywords": ["Prometheus", "Helm"]
   }
 }`;
 

@@ -6,6 +6,8 @@ import { useState, useRef } from "react";
 interface ResumeInputProps {
   value: string;
   onChange: (value: string) => void;
+  jobDescription?: string;
+  onJobDescriptionChange?: (value: string) => void;
   onGenerate: () => void;
   isLoading: boolean;
   onLoadSample: () => void;
@@ -13,13 +15,38 @@ interface ResumeInputProps {
   onTargetPagesChange: (pages: number) => void;
 }
 
-export default function ResumeInput({ value, onChange, onGenerate, isLoading, onLoadSample, targetPages, onTargetPagesChange }: ResumeInputProps) {
+const SAMPLE_JOB_PRESETS = [
+  {
+    title: "🛠️ AWS Senior DevOps Architect",
+    jd: "Senior Multi-Cloud & DevOps Architect. Requirements: AWS (EC2, EKS, S3, IAM), Kubernetes, Terraform, Infrastructure as Code, CI/CD automation pipelines, Docker, Prometheus monitoring, zero-downtime microservices deployments, 99.99% SLA uptime management.",
+  },
+  {
+    title: "💻 Google Senior Full Stack Engineer",
+    jd: "Senior Full Stack Engineer. Requirements: React, Next.js, TypeScript, Node.js, Distributed Systems, Redis caching, GraphQL & REST APIs, microservices architecture, automated unit/integration testing, cloud-native high-throughput engineering.",
+  },
+  {
+    title: "🚀 Stripe Technical Product Manager",
+    jd: "Technical Product Manager. Requirements: Distributed API design, payment infrastructure, developer platform ecosystem, cross-functional engineering roadmap alignment, data-driven feature analytics, technical specification drafting.",
+  },
+];
+
+export default function ResumeInput({
+  value,
+  onChange,
+  jobDescription = "",
+  onJobDescriptionChange,
+  onGenerate,
+  isLoading,
+  onLoadSample,
+  targetPages,
+  onTargetPagesChange,
+}: ResumeInputProps) {
   const [activeTab, setActiveTab] = useState<"upload" | "text">("upload");
+  const [mode, setMode] = useState<"general" | "targeted">("general");
   const [isUploading, setIsUploading] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
   const [extractedInfo, setExtractedInfo] = useState<{ pages: number; wordCount: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [showRawPreview, setShowRawPreview] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const processFile = async (file: File) => {
@@ -87,37 +114,91 @@ export default function ResumeInput({ value, onChange, onGenerate, isLoading, on
 
   return (
     <div className="w-full max-w-5xl mx-auto flex flex-col gap-6">
-      {/* Mode Switcher */}
+      {/* Primary Workflow Switcher: General ATS vs Targeted Job Matcher */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-2 bg-[#0a0a0f] rounded-2xl border border-white/10 shadow-lg">
+        <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 flex-1">
+          <button
+            onClick={() => setMode("general")}
+            className={`flex-1 py-2.5 px-4 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+              mode === "general"
+                ? "bg-gradient-to-r from-[#06b6d4] to-[#7c3aed] text-white shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <i className="fa-solid fa-bolt text-xs" />
+            <span>⚡ General ATS Builder</span>
+          </button>
+
+          <button
+            onClick={() => setMode("targeted")}
+            className={`flex-1 py-2.5 px-4 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+              mode === "targeted"
+                ? "bg-gradient-to-r from-emerald-500 via-[#06b6d4] to-[#7c3aed] text-white shadow-[0_0_20px_rgba(16,185,129,0.35)]"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <i className="fa-solid fa-bullseye text-xs text-emerald-300" />
+            <span>🎯 Target Job Matcher (1-Click Customizer)</span>
+          </button>
+        </div>
+
+        {/* Target Page Target Switcher */}
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-black/30 rounded-xl border border-white/5 justify-center">
+          <span className="text-xs text-slate-400 font-semibold">Format:</span>
+          <button
+            onClick={() => onTargetPagesChange(1)}
+            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+              targetPages === 1
+                ? "bg-[#06b6d4]/20 border border-[#06b6d4]/40 text-[#38bdf8]"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            1-Page Target
+          </button>
+          <button
+            onClick={() => onTargetPagesChange(2)}
+            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
+              targetPages === 2
+                ? "bg-[#7c3aed]/20 border border-[#7c3aed]/40 text-[#a78bfa]"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            2-Page Detailed
+          </button>
+        </div>
+      </div>
+
+      {/* Mode Sub-Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex bg-[#0a0a0f] p-1.5 rounded-xl border border-white/10">
           <button
             onClick={() => setActiveTab("upload")}
-            className={`px-5 py-2.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all ${
+            className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
               activeTab === "upload"
-                ? "bg-gradient-to-r from-[#06b6d4] to-[#7c3aed] text-white shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+                ? "bg-white/10 text-white border border-white/10"
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            <i className="fa-solid fa-file-arrow-up text-sm" />
-            <span>Upload Resume PDF / File</span>
+            <i className="fa-solid fa-file-arrow-up text-xs" />
+            <span>Upload Resume File / PDF</span>
           </button>
 
           <button
             onClick={() => setActiveTab("text")}
-            className={`px-5 py-2.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all ${
+            className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
               activeTab === "text"
-                ? "bg-gradient-to-r from-[#06b6d4] to-[#7c3aed] text-white shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+                ? "bg-white/10 text-white border border-white/10"
                 : "text-slate-400 hover:text-white"
             }`}
           >
-            <i className="fa-solid fa-pen-to-square text-sm" />
-            <span>Type / Paste Text Notes</span>
+            <i className="fa-solid fa-pen-to-square text-xs" />
+            <span>Type / Paste Notes</span>
           </button>
         </div>
 
         <span className="text-xs text-slate-400 font-medium flex items-center gap-1.5">
           <i className="fa-solid fa-shield-halved text-[#06b6d4]" />
-          100% Private · Zero Storage · In-Memory AI Processing
+          100% Private · In-Memory AI Processing
         </span>
       </div>
 
@@ -129,195 +210,151 @@ export default function ResumeInput({ value, onChange, onGenerate, isLoading, on
         className="hidden"
       />
 
-      {/* Main Content Area */}
-      {activeTab === "upload" ? (
-        <div className="flex flex-col gap-4">
-          {!fileName ? (
+      {/* Main Content Area: General vs Targeted layout */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        {/* Candidate Background Input Column */}
+        <div className={mode === "targeted" ? "md:col-span-6 flex flex-col gap-4" : "md:col-span-12 flex flex-col gap-4"}>
+          <div className="flex justify-between items-center">
+            <label className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+              <i className="fa-solid fa-user-gear text-[#06b6d4]" />
+              1. Candidate Background / Old Resume
+            </label>
+            {value && (
+              <span className="text-[11px] text-slate-400 font-medium">
+                {value.trim().split(/\s+/).filter(Boolean).length} words
+              </span>
+            )}
+          </div>
+
+          {activeTab === "upload" && !fileName ? (
             <div
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`relative cursor-pointer w-full h-64 md:h-72 rounded-2xl border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center p-6 text-center shadow-2xl ${
+              className={`relative cursor-pointer w-full h-56 rounded-2xl border-2 border-dashed transition-all duration-300 flex flex-col items-center justify-center p-6 text-center shadow-xl ${
                 isDragging
                   ? "border-[#06b6d4] bg-[#06b6d4]/10 scale-[1.01]"
                   : "border-white/15 bg-[#12121a]/80 hover:border-[#06b6d4]/50 hover:bg-[#12121a]"
               }`}
             >
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#06b6d4]/20 to-[#7c3aed]/20 border border-[#06b6d4]/30 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
-                <i className={`fa-solid ${isUploading ? "fa-spinner animate-spin" : "fa-cloud-arrow-up"} text-2xl text-[#38bdf8]`} />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#06b6d4]/20 to-[#7c3aed]/20 border border-[#06b6d4]/30 flex items-center justify-center mb-3 shadow-md">
+                <i className={`fa-solid ${isUploading ? "fa-spinner animate-spin" : "fa-cloud-arrow-up"} text-xl text-[#38bdf8]`} />
               </div>
-
-              <h3 className="text-white text-lg font-bold mb-1">
-                {isUploading ? "Reading & Extracting Document..." : "Drag & Drop your Resume PDF here"}
-              </h3>
-              <p className="text-slate-400 text-sm mb-4 max-w-md">
-                Supports PDF resumes, LinkedIn exported PDFs, or TXT files.
-              </p>
-
+              <h4 className="text-white text-sm font-bold mb-1">
+                {isUploading ? "Reading Document..." : "Drag & Drop Resume PDF"}
+              </h4>
+              <p className="text-slate-400 text-xs mb-3">PDF or TXT files</p>
               <button
                 type="button"
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#06b6d4] to-[#7c3aed] text-white text-xs font-bold shadow-md hover:brightness-110 transition-all flex items-center gap-2"
+                className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#06b6d4] to-[#7c3aed] text-white text-xs font-bold shadow-md"
               >
-                <i className="fa-solid fa-folder-open text-xs" />
                 Browse File
               </button>
             </div>
-          ) : (
-            <div className="w-full bg-[#12121a]/90 border border-emerald-500/30 rounded-2xl p-6 shadow-2xl flex flex-col gap-4">
-              <div className="flex items-center justify-between flex-wrap gap-4 border-b border-white/10 pb-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
-                    <i className="fa-solid fa-file-pdf text-xl text-emerald-400" />
-                  </div>
+          ) : activeTab === "upload" && fileName ? (
+            <div className="w-full bg-[#12121a]/90 border border-emerald-500/30 rounded-2xl p-5 shadow-xl flex flex-col gap-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-3">
+                  <i className="fa-solid fa-file-pdf text-xl text-emerald-400" />
                   <div>
-                    <h4 className="text-white font-bold text-base flex items-center gap-2">
-                      {fileName}
-                      <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                        Parsed Ready
-                      </span>
-                    </h4>
-                    <p className="text-slate-400 text-xs mt-0.5">
-                      {extractedInfo?.pages} Page(s) · {extractedInfo?.wordCount} Words extracted
-                    </p>
+                    <h5 className="text-white font-bold text-xs">{fileName}</h5>
+                    <p className="text-slate-400 text-[11px]">{extractedInfo?.wordCount} Words parsed</p>
                   </div>
                 </div>
-
                 <button
                   onClick={() => {
                     setFileName(null);
                     setExtractedInfo(null);
                     onChange("");
                   }}
-                  className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-rose-400 text-xs font-medium transition-colors flex items-center gap-1.5"
+                  className="text-xs text-rose-400 hover:text-rose-300"
                 >
-                  <i className="fa-solid fa-rotate-left" />
-                  <span>Choose Different File</span>
+                  Clear File
                 </button>
               </div>
-
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={() => setShowRawPreview(!showRawPreview)}
-                  className="text-xs text-[#38bdf8] font-semibold hover:underline flex items-center gap-1.5"
-                >
-                  <i className={`fa-solid ${showRawPreview ? "fa-chevron-up" : "fa-chevron-down"}`} />
-                  <span>{showRawPreview ? "Hide Extracted Text" : "View Extracted Text Preview"}</span>
-                </button>
-                <span className="text-xs text-slate-500">Gemini will optimize bullet points & verbs automatically</span>
-              </div>
-
-              {showRawPreview && (
-                <div className="p-4 rounded-xl bg-[#0a0a0f] border border-white/10 max-h-48 overflow-y-auto custom-scrollbar text-slate-300 text-xs font-mono leading-relaxed whitespace-pre-wrap">
-                  {value}
-                </div>
-              )}
             </div>
+          ) : (
+            <textarea
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder="Describe your candidate background, paste your old resume draft, or write rough bullet points..."
+              rows={8}
+              className="w-full p-4 rounded-2xl bg-[#0a0a0f] text-sm text-slate-200 border border-white/10 placeholder:text-slate-600 focus:outline-none focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4]/50 transition-all resize-y custom-scrollbar"
+            />
           )}
         </div>
-      ) : (
-        <div className="relative">
-          <textarea
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder="Type or paste your background, rough bullets, career history, or old draft text here..."
-            className="w-full h-64 md:h-72 bg-[#12121a]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-6 text-white text-lg placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#06b6d4] focus:border-transparent resize-none transition-all duration-300 shadow-2xl"
-            spellCheck={false}
-          />
-        </div>
-      )}
 
-      {/* Format Badges & Target Length Controller */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-[#12121a]/60 border border-white/10 rounded-xl p-4 backdrop-blur-md flex flex-col justify-between">
-          <h3 className="text-[#38bdf8] text-xs font-semibold mb-2 uppercase tracking-wider flex items-center gap-2">
-            <i className="fa-solid fa-sliders text-xs" />
-            Target Resume Length
-          </h3>
-          <div className="flex bg-[#0a0a0f] p-1 rounded-xl border border-white/10">
-            <button
-              onClick={() => onTargetPagesChange(1)}
-              className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                targetPages === 1
-                  ? "bg-gradient-to-r from-[#06b6d4] to-[#7c3aed] text-white shadow-md"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              <i className="fa-solid fa-file text-xs" />
-              <span>Strict 1 Page (Top Projects)</span>
-            </button>
-            <button
-              onClick={() => onTargetPagesChange(2)}
-              className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                targetPages === 2
-                  ? "bg-gradient-to-r from-[#06b6d4] to-[#7c3aed] text-white shadow-md"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              <i className="fa-solid fa-file-lines text-xs" />
-              <span>2 Pages (Executive)</span>
-            </button>
-          </div>
-          <p className="text-[11px] text-slate-400 mt-2">
-            {targetPages === 1
-              ? "🎯 AI will weight & select your top 3 highest-impact projects to guarantee a clean 1-page fit."
-              : "📑 Includes up to 5-6 projects with expanded architecture details across 2 pages."}
-          </p>
-        </div>
+        {/* Target Job Description Column (Visible in Targeted mode) */}
+        {mode === "targeted" && (
+          <div className="md:col-span-6 flex flex-col gap-4">
+            <div className="flex justify-between items-center">
+              <label className="text-xs font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i className="fa-solid fa-bullseye text-emerald-400" />
+                2. Target Job Description
+              </label>
+              <span className="text-[11px] text-emerald-400 font-semibold">1-Click Match</span>
+            </div>
 
-        <div className="bg-[#12121a]/60 border border-white/10 rounded-xl p-4 backdrop-blur-md flex flex-col justify-between">
-          <h3 className="text-[#38bdf8] text-xs font-semibold mb-2 uppercase tracking-wider flex items-center gap-2">
-            <i className="fa-solid fa-check-double text-xs" />
-            Supported Inputs
-          </h3>
-          <div className="flex flex-wrap gap-1.5">
-            {[
-              "PDF Resume Document",
-              "LinkedIn Profile PDF",
-              "TXT File",
-              "Rough Bullets",
-              "Career Summary"
-            ].map((tag, i) => (
-              <span key={i} className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-slate-300 text-[11px] font-medium">
-                {tag}
-              </span>
-            ))}
+            <textarea
+              value={jobDescription}
+              onChange={(e) => onJobDescriptionChange && onJobDescriptionChange(e.target.value)}
+              placeholder="Paste the target job description (responsibilities, required skills, key terms)..."
+              rows={6}
+              className="w-full p-4 rounded-2xl bg-[#0a0a0f] text-sm text-slate-200 border border-emerald-500/30 placeholder:text-slate-600 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/50 transition-all resize-y custom-scrollbar"
+            />
+
+            {/* 1-Click Sample Preset Buttons */}
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[11px] text-slate-400 font-medium">Or load a 1-click sample job description:</span>
+              <div className="flex flex-wrap gap-1.5">
+                {SAMPLE_JOB_PRESETS.map((preset, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => onJobDescriptionChange && onJobDescriptionChange(preset.jd)}
+                    className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[11px] font-medium transition-all text-left"
+                  >
+                    {preset.title}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Actions Row */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center">
+      {/* Action Bar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
         <button
+          type="button"
           onClick={onLoadSample}
-          disabled={isLoading}
-          className="w-full sm:w-auto px-6 py-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+          className="w-full sm:w-auto px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
-          <i className="fa-solid fa-flask text-slate-400" />
-          <span>Load sample draft</span>
+          <i className="fa-solid fa-[#06b6d4] fa-bolt text-cyan-400" />
+          <span>⚡ Load Technical Sample Demo</span>
         </button>
+
         <button
+          type="button"
           onClick={onGenerate}
-          disabled={isLoading || !value.trim()}
-          className="w-full flex-1 relative group px-6 py-4 rounded-xl bg-gradient-to-r from-[#06b6d4] via-[#7c3aed] to-[#a78bfa] text-white font-bold text-lg shadow-[0_0_25px_rgba(6,182,212,0.35)] hover:shadow-[0_0_35px_rgba(6,182,212,0.5)] transition-all overflow-hidden disabled:opacity-70 disabled:cursor-not-allowed"
+          disabled={isLoading}
+          className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 via-[#06b6d4] to-[#7c3aed] text-white font-black text-sm shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:shadow-[0_0_35px_rgba(6,182,212,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
         >
-          <div className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-          <span className="relative flex items-center justify-center gap-3">
-            {isLoading ? (
-              <>
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Analysing & Optimising Resume...
-              </>
-            ) : (
-              <>
-                <i className="fa-solid fa-wand-magic-sparkles text-cyan-300" />
-                Generate ATS Resume
-              </>
-            )}
-          </span>
+          {isLoading ? (
+            <>
+              <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              <span>{mode === "targeted" ? "Aligning Resume to Job Description..." : "Optimising ATS Resume..."}</span>
+            </>
+          ) : (
+            <>
+              <i className="fa-solid fa-[#06b6d4] fa-wand-magic-sparkles" />
+              <span>{mode === "targeted" ? "🎯 Generate Job-Targeted Resume" : "⚡ Generate ATS Resume"}</span>
+            </>
+          )}
         </button>
       </div>
     </div>

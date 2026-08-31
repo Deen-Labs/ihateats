@@ -293,19 +293,14 @@ export default function Home() {
                     <ResumeInput
                       value={rawText}
                       onChange={setRawText}
+                      jobDescription={jobDescription}
+                      onJobDescriptionChange={setJobDescription}
                       onGenerate={handleGenerate}
                       isLoading={isLoading}
                       onLoadSample={handleLoadSample}
                       targetPages={targetPages}
                       onTargetPagesChange={setTargetPages}
                     />
-
-                    <div className="mt-4">
-                      <JobMatcher
-                        value={jobDescription}
-                        onChange={setJobDescription}
-                      />
-                    </div>
                   </div>
 
                   {error && (
