@@ -1,4 +1,4 @@
-﻿# 🧪 ResumeLabs
+﻿# ResumeLabs
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
@@ -12,18 +12,18 @@ Powered by our proprietary **Lab Engine AI**, it ensures you never get auto-reje
 
 ---
 
-## ✨ Features
+## Features
 
-- **🎯 Target Job Matcher**: Paste a Job Description and the AI will analyze missing keywords, score your resume, and re-write your bullets to perfectly align with the specific role.
-- **📄 Instant PDF Parsing**: Upload an old PDF resume, and our extractor will pull your data instantly into the editor.
-- **👁️ Live Preview Editor**: Drag-and-drop array reordering, direct text-box editing, and a side-by-side split screen showing exactly how the final PDF looks in real-time.
-- **🚀 One-Click PDF Export**: Generates a mathematically perfect, Jake's Resume style PDF format using @react-pdf/renderer—no LaTeX installation required.
-- **📊 ATS Scoring Dashboard**: Visual gauges and donut charts analyzing your experience breakdown, word counts, and ATS compliance score.
-- **💳 Razorpay Freemium Quotas**: Built-in daily generation quotas with Razorpay integration for unlimited "Pro" access.
+- **Target Job Matcher**: Paste a Job Description and the AI will analyze missing keywords, score your resume, and re-write your bullets to perfectly align with the specific role.
+- **Instant PDF Parsing**: Upload an old PDF resume, and our extractor will pull your data instantly into the editor.
+- **Live Preview Editor**: Drag-and-drop array reordering, direct text-box editing, and a side-by-side split screen showing exactly how the final PDF looks in real-time.
+- **One-Click PDF Export**: Generates a mathematically perfect, Jake's Resume style PDF format using @react-pdf/renderer - no LaTeX installation required.
+- **ATS Scoring Dashboard**: Visual gauges and donut charts analyzing your experience breakdown, word counts, and ATS compliance score.
+- **Razorpay Freemium Quotas**: Built-in daily generation quotas with Razorpay integration for unlimited "Pro" access.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
@@ -35,7 +35,7 @@ Powered by our proprietary **Lab Engine AI**, it ensures you never get auto-reje
 
 ---
 
-## 🚀 Local Development Setup
+## Local Development Setup
 
 1. **Clone the repository:**
    `ash
@@ -70,7 +70,7 @@ Powered by our proprietary **Lab Engine AI**, it ensures you never get auto-reje
 
 ---
 
-## 👨‍💻 Developer Mode (Unlimited Generations)
+## Developer Mode (Unlimited Generations)
 
 While testing locally or in production, you can bypass the Razorpay paywall and quota limits using **Developer Mode**:
 
@@ -81,6 +81,6 @@ This will unlock unlimited Lab Engine AI generations for your session.
 
 ---
 
-## 📜 License
+## License
 
 Designed and Engineered by [Deen Labs](https://github.com/Deen-Labs). All rights reserved.
