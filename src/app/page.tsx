@@ -13,7 +13,7 @@ import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import PDFExport from "@/components/PDFExport";
 import QuotaBadge from "@/components/QuotaBadge";
 import PaywallModal from "@/components/PaywallModal";
-import { getQuotaState, consumeCredit, type QuotaState } from "@/lib/quota";
+import { getQuotaState, consumeCredit, toggleDevMode, type QuotaState } from "@/lib/quota";
 
 import { SAMPLE_TECHNICAL_RAW_TEXT, SAMPLE_TECHNICAL_RESUME_DATA } from "@/lib/sampleData";
 import { smoothScrollTo } from "@/lib/smoothScroll";
@@ -50,10 +50,24 @@ export default function Home() {
 
   const [quota, setQuota] = useState<QuotaState>({ remaining: 2, limit: 2, isPro: false });
   const [showPaywall, setShowPaywall] = useState<boolean>(false);
+  const [logoClickCount, setLogoClickCount] = useState(0);
 
   useEffect(() => {
     setHistory(loadHistory());
     setQuota(getQuotaState());
+
+    // Keyboard Shortcut Ctrl + Shift + D (or Cmd + Shift + D) to toggle Dev Mode
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === "D" || e.key === "d")) {
+        e.preventDefault();
+        const active = toggleDevMode();
+        setQuota(getQuotaState());
+        alert(active ? "🛠️ Developer Mode ENABLED (Unlimited AI Generations)" : "🔒 Developer Mode DISABLED (Free Tier Restored)");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   useEffect(() => {
@@ -214,7 +228,24 @@ export default function Home() {
 
       <nav className="relative z-10 glass-card mx-4 sm:mx-6 lg:mx-8 mt-4 px-6 py-4 flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-baseline gap-3">
-          <span className="text-xl font-bold text-white tracking-tight">
+          <span
+            onClick={() => {
+              const nextCount = logoClickCount + 1;
+              setLogoClickCount(nextCount);
+              if (nextCount >= 5) {
+                setLogoClickCount(0);
+                const active = toggleDevMode();
+                setQuota(getQuotaState());
+                alert(
+                  active
+                    ? "🛠️ Developer Mode ENABLED (Unlimited AI Generations)"
+                    : "🔒 Developer Mode DISABLED (Free Tier Restored)"
+                );
+              }
+            }}
+            className="text-xl font-bold text-white tracking-tight cursor-pointer select-none"
+            title="Click 5 times to toggle Developer Mode"
+          >
             ResumeLabs
           </span>
           <span className="text-xs text-[#94a3b8] font-medium hidden sm:inline">
