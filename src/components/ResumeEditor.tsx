@@ -4,6 +4,17 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ResumeData, ExperienceItem, SkillCategory, CertificationItem, EducationItem, ProjectItem } from "@/lib/schema";
 
+function moveItem<T>(arr: T[], index: number, direction: "up" | "down"): T[] {
+  if (!arr) return [];
+  const newArr = [...arr];
+  if (direction === "up" && index > 0) {
+    [newArr[index - 1], newArr[index]] = [newArr[index], newArr[index - 1]];
+  } else if (direction === "down" && index < newArr.length - 1) {
+    [newArr[index + 1], newArr[index]] = [newArr[index], newArr[index + 1]];
+  }
+  return newArr;
+}
+
 interface ResumeEditorProps {
   data: ResumeData;
   onChange: (data: ResumeData) => void;
@@ -184,17 +195,35 @@ export default function ResumeEditor({ data, onChange, onFocusSection }: ResumeE
               <h4 className="text-sm font-bold text-[#06b6d4]">Role #{i + 1}</h4>
               {exp.company && <span className="text-xs text-slate-400 font-medium">— {exp.company}</span>}
             </div>
-            <button
-              onClick={() => {
-                const newExp = (data.experience || []).filter((_, idx) => idx !== i);
-                updateData({ experience: newExp });
-              }}
-              className="text-xs text-rose-400 hover:text-rose-300 p-1.5 rounded hover:bg-rose-500/10 transition-colors flex items-center gap-1 font-semibold"
-              title="Delete Role"
-            >
-              <i className="fa-solid fa-trash-can text-xs" />
-              <span>Remove Role</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                disabled={i === 0}
+                onClick={() => updateData({ experience: moveItem(data.experience || [], i, "up") })}
+                className="text-xs text-slate-500 hover:text-white p-1.5 rounded hover:bg-white/10 disabled:opacity-30 transition-colors"
+                title="Move Up"
+              >
+                <i className="fa-solid fa-arrow-up text-xs" />
+              </button>
+              <button
+                disabled={i === (data.experience || []).length - 1}
+                onClick={() => updateData({ experience: moveItem(data.experience || [], i, "down") })}
+                className="text-xs text-slate-500 hover:text-white p-1.5 rounded hover:bg-white/10 disabled:opacity-30 transition-colors"
+                title="Move Down"
+              >
+                <i className="fa-solid fa-arrow-down text-xs" />
+              </button>
+              <button
+                onClick={() => {
+                  const newExp = (data.experience || []).filter((_, idx) => idx !== i);
+                  updateData({ experience: newExp });
+                }}
+                className="text-xs text-rose-400 hover:text-rose-300 p-1.5 rounded hover:bg-rose-500/10 transition-colors flex items-center gap-1 font-semibold ml-2"
+                title="Delete Role"
+              >
+                <i className="fa-solid fa-trash-can text-xs" />
+                <span>Remove</span>
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -265,18 +294,48 @@ export default function ResumeEditor({ data, onChange, onFocusSection }: ResumeE
                   }}
                   className="flex-1 bg-[#0a0a0f] border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-[#06b6d4] transition-all"
                 />
-                <button
-                  onClick={() => {
-                    const newBullets = (exp.bullets || []).filter((_, idx) => idx !== bIdx);
-                    const newExp = [...data.experience];
-                    newExp[i] = { ...exp, bullets: newBullets };
-                    updateData({ experience: newExp });
-                  }}
-                  className="text-slate-500 hover:text-rose-400 p-1.5 rounded hover:bg-rose-500/10 transition-colors"
-                  title="Remove Bullet"
-                >
-                  <i className="fa-solid fa-xmark text-xs" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <div className="flex flex-col gap-0 border border-white/5 rounded overflow-hidden">
+                    <button
+                      disabled={bIdx === 0}
+                      onClick={() => {
+                        const newBullets = moveItem(exp.bullets || [], bIdx, "up");
+                        const newExp = [...data.experience];
+                        newExp[i] = { ...exp, bullets: newBullets };
+                        updateData({ experience: newExp });
+                      }}
+                      className="text-[9px] text-slate-500 hover:text-white bg-white/5 hover:bg-white/10 px-1.5 py-0.5 disabled:opacity-30 transition-colors"
+                      title="Move Up"
+                    >
+                      <i className="fa-solid fa-chevron-up" />
+                    </button>
+                    <button
+                      disabled={bIdx === (exp.bullets || []).length - 1}
+                      onClick={() => {
+                        const newBullets = moveItem(exp.bullets || [], bIdx, "down");
+                        const newExp = [...data.experience];
+                        newExp[i] = { ...exp, bullets: newBullets };
+                        updateData({ experience: newExp });
+                      }}
+                      className="text-[9px] text-slate-500 hover:text-white bg-white/5 hover:bg-white/10 px-1.5 py-0.5 disabled:opacity-30 transition-colors"
+                      title="Move Down"
+                    >
+                      <i className="fa-solid fa-chevron-down" />
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => {
+                      const newBullets = (exp.bullets || []).filter((_, idx) => idx !== bIdx);
+                      const newExp = [...data.experience];
+                      newExp[i] = { ...exp, bullets: newBullets };
+                      updateData({ experience: newExp });
+                    }}
+                    className="text-slate-500 hover:text-rose-400 p-1.5 rounded hover:bg-rose-500/10 transition-colors ml-1"
+                    title="Remove Bullet"
+                  >
+                    <i className="fa-solid fa-xmark text-sm" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -329,13 +388,29 @@ export default function ResumeEditor({ data, onChange, onFocusSection }: ResumeE
                   }}
                 />
               </div>
-              <div className="md:col-span-1 flex justify-end pt-5">
+              <div className="md:col-span-1 flex flex-col md:flex-row md:items-center justify-end pt-5 gap-1">
+                <button
+                  disabled={i === 0}
+                  onClick={() => updateData({ skills: moveItem(data.skills || [], i, "up") })}
+                  className="text-slate-500 hover:text-white p-1.5 rounded hover:bg-white/10 disabled:opacity-30 transition-colors"
+                  title="Move Up"
+                >
+                  <i className="fa-solid fa-arrow-up text-xs" />
+                </button>
+                <button
+                  disabled={i === (data.skills || []).length - 1}
+                  onClick={() => updateData({ skills: moveItem(data.skills || [], i, "down") })}
+                  className="text-slate-500 hover:text-white p-1.5 rounded hover:bg-white/10 disabled:opacity-30 transition-colors"
+                  title="Move Down"
+                >
+                  <i className="fa-solid fa-arrow-down text-xs" />
+                </button>
                 <button
                   onClick={() => {
                     const newSkills = (data.skills || []).filter((_, idx) => idx !== i);
                     updateData({ skills: newSkills });
                   }}
-                  className="text-slate-500 hover:text-rose-400 p-2 rounded hover:bg-rose-500/10 transition-colors"
+                  className="text-slate-500 hover:text-rose-400 p-1.5 rounded hover:bg-rose-500/10 transition-colors ml-1"
                   title="Delete Category"
                 >
                   <i className="fa-solid fa-trash-can text-sm" />
@@ -387,13 +462,29 @@ export default function ResumeEditor({ data, onChange, onFocusSection }: ResumeE
                   updateData({ certifications: newCerts });
                 }} />
               </div>
-              <div className="md:col-span-1 flex justify-end pt-5">
+              <div className="md:col-span-1 flex flex-col md:flex-row md:items-center justify-end pt-5 gap-1">
+                <button
+                  disabled={i === 0}
+                  onClick={() => updateData({ certifications: moveItem(data.certifications || [], i, "up") })}
+                  className="text-slate-500 hover:text-white p-1.5 rounded hover:bg-white/10 disabled:opacity-30 transition-colors"
+                  title="Move Up"
+                >
+                  <i className="fa-solid fa-arrow-up text-xs" />
+                </button>
+                <button
+                  disabled={i === (data.certifications || []).length - 1}
+                  onClick={() => updateData({ certifications: moveItem(data.certifications || [], i, "down") })}
+                  className="text-slate-500 hover:text-white p-1.5 rounded hover:bg-white/10 disabled:opacity-30 transition-colors"
+                  title="Move Down"
+                >
+                  <i className="fa-solid fa-arrow-down text-xs" />
+                </button>
                 <button
                   onClick={() => {
                     const newCerts = (data.certifications || []).filter((_, idx) => idx !== i);
                     updateData({ certifications: newCerts });
                   }}
-                  className="text-slate-500 hover:text-rose-400 p-2 rounded hover:bg-rose-500/10 transition-colors"
+                  className="text-slate-500 hover:text-rose-400 p-1.5 rounded hover:bg-rose-500/10 transition-colors ml-1"
                   title="Delete Certification"
                 >
                   <i className="fa-solid fa-trash-can text-sm" />
@@ -428,16 +519,34 @@ export default function ResumeEditor({ data, onChange, onFocusSection }: ResumeE
             <div key={i} className="p-4 rounded-xl border border-white/10 bg-white/[0.02] flex flex-col gap-4 relative">
               <div className="flex justify-between items-center border-b border-white/5 pb-2">
                 <h4 className="text-sm font-bold text-[#06b6d4]">Education #{i + 1}</h4>
-                <button
-                  onClick={() => {
-                    const newEdu = (data.education || []).filter((_, idx) => idx !== i);
-                    updateData({ education: newEdu });
-                  }}
-                  className="text-xs text-rose-400 hover:text-rose-300 p-1 rounded hover:bg-rose-500/10 transition-colors flex items-center gap-1 font-semibold"
-                >
-                  <i className="fa-solid fa-trash-can text-xs" />
-                  <span>Remove</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={i === 0}
+                    onClick={() => updateData({ education: moveItem(data.education || [], i, "up") })}
+                    className="text-xs text-slate-500 hover:text-white p-1.5 rounded hover:bg-white/10 disabled:opacity-30 transition-colors"
+                    title="Move Up"
+                  >
+                    <i className="fa-solid fa-arrow-up text-xs" />
+                  </button>
+                  <button
+                    disabled={i === (data.education || []).length - 1}
+                    onClick={() => updateData({ education: moveItem(data.education || [], i, "down") })}
+                    className="text-xs text-slate-500 hover:text-white p-1.5 rounded hover:bg-white/10 disabled:opacity-30 transition-colors"
+                    title="Move Down"
+                  >
+                    <i className="fa-solid fa-arrow-down text-xs" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newEdu = (data.education || []).filter((_, idx) => idx !== i);
+                      updateData({ education: newEdu });
+                    }}
+                    className="text-xs text-rose-400 hover:text-rose-300 p-1.5 rounded hover:bg-rose-500/10 transition-colors flex items-center gap-1 font-semibold ml-2"
+                  >
+                    <i className="fa-solid fa-trash-can text-xs" />
+                    <span>Remove</span>
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -496,16 +605,34 @@ export default function ResumeEditor({ data, onChange, onFocusSection }: ResumeE
             <div key={i} className="p-4 rounded-xl border border-white/10 bg-white/[0.02] flex flex-col gap-4 relative">
               <div className="flex justify-between items-center border-b border-white/5 pb-2">
                 <h4 className="text-sm font-bold text-[#06b6d4]">Project #{i + 1}</h4>
-                <button
-                  onClick={() => {
-                    const newProj = (data.projects || []).filter((_, idx) => idx !== i);
-                    updateData({ projects: newProj });
-                  }}
-                  className="text-xs text-rose-400 hover:text-rose-300 p-1 rounded hover:bg-rose-500/10 transition-colors flex items-center gap-1 font-semibold"
-                >
-                  <i className="fa-solid fa-trash-can text-xs" />
-                  <span>Remove</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={i === 0}
+                    onClick={() => updateData({ projects: moveItem(data.projects || [], i, "up") })}
+                    className="text-xs text-slate-500 hover:text-white p-1.5 rounded hover:bg-white/10 disabled:opacity-30 transition-colors"
+                    title="Move Up"
+                  >
+                    <i className="fa-solid fa-arrow-up text-xs" />
+                  </button>
+                  <button
+                    disabled={i === (data.projects || []).length - 1}
+                    onClick={() => updateData({ projects: moveItem(data.projects || [], i, "down") })}
+                    className="text-xs text-slate-500 hover:text-white p-1.5 rounded hover:bg-white/10 disabled:opacity-30 transition-colors"
+                    title="Move Down"
+                  >
+                    <i className="fa-solid fa-arrow-down text-xs" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      const newProj = (data.projects || []).filter((_, idx) => idx !== i);
+                      updateData({ projects: newProj });
+                    }}
+                    className="text-xs text-rose-400 hover:text-rose-300 p-1.5 rounded hover:bg-rose-500/10 transition-colors flex items-center gap-1 font-semibold ml-2"
+                  >
+                    <i className="fa-solid fa-trash-can text-xs" />
+                    <span>Remove</span>
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
