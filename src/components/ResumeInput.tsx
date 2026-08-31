@@ -17,15 +17,15 @@ interface ResumeInputProps {
 
 const SAMPLE_JOB_PRESETS = [
   {
-    title: "🛠️ AWS Senior DevOps Architect",
+    title: "AWS Senior DevOps Architect",
     jd: "Senior Multi-Cloud & DevOps Architect. Requirements: AWS (EC2, EKS, S3, IAM), Kubernetes, Terraform, Infrastructure as Code, CI/CD automation pipelines, Docker, Prometheus monitoring, zero-downtime microservices deployments, 99.99% SLA uptime management.",
   },
   {
-    title: "💻 Google Senior Full Stack Engineer",
+    title: "Google Senior Full Stack Engineer",
     jd: "Senior Full Stack Engineer. Requirements: React, Next.js, TypeScript, Node.js, Distributed Systems, Redis caching, GraphQL & REST APIs, microservices architecture, automated unit/integration testing, cloud-native high-throughput engineering.",
   },
   {
-    title: "🚀 Stripe Technical Product Manager",
+    title: "Stripe Technical Product Manager",
     jd: "Technical Product Manager. Requirements: Distributed API design, payment infrastructure, developer platform ecosystem, cross-functional engineering roadmap alignment, data-driven feature analytics, technical specification drafting.",
   },
 ];
@@ -126,7 +126,7 @@ export default function ResumeInput({
             }`}
           >
             <i className="fa-solid fa-bolt text-xs" />
-            <span>⚡ General ATS Builder</span>
+            <span>General ATS Builder</span>
           </button>
 
           <button
@@ -138,7 +138,7 @@ export default function ResumeInput({
             }`}
           >
             <i className="fa-solid fa-bullseye text-xs text-emerald-300" />
-            <span>🎯 Target Job Matcher (1-Click Customizer)</span>
+            <span>Target Job Matcher (1-Click Customizer)</span>
           </button>
         </div>
 
@@ -332,7 +332,7 @@ export default function ResumeInput({
           className="w-full sm:w-auto px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
           <i className="fa-solid fa-[#06b6d4] fa-bolt text-cyan-400" />
-          <span>⚡ Load Technical Sample Demo</span>
+          <span>Load Technical Sample Demo</span>
         </button>
 
         <button
@@ -352,7 +352,7 @@ export default function ResumeInput({
           ) : (
             <>
               <i className="fa-solid fa-[#06b6d4] fa-wand-magic-sparkles" />
-              <span>{mode === "targeted" ? "🎯 Generate Job-Targeted Resume" : "⚡ Generate ATS Resume"}</span>
+              <span>{mode === "targeted" ? "Generate Job-Targeted Resume" : "Generate ATS Resume"}</span>
             </>
           )}
         </button>

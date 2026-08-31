@@ -62,7 +62,7 @@ export default function Home() {
         e.preventDefault();
         const active = toggleDevMode();
         setQuota(getQuotaState());
-        alert(active ? "🛠️ Developer Mode ENABLED (Unlimited AI Generations)" : "🔒 Developer Mode DISABLED (Free Tier Restored)");
+        alert(active ? "Developer Mode ENABLED (Unlimited AI Generations)" : "Developer Mode DISABLED (Free Tier Restored)");
       }
     };
 
@@ -238,8 +238,8 @@ export default function Home() {
                 setQuota(getQuotaState());
                 alert(
                   active
-                    ? "🛠️ Developer Mode ENABLED (Unlimited AI Generations)"
-                    : "🔒 Developer Mode DISABLED (Free Tier Restored)"
+                    ? "Developer Mode ENABLED (Unlimited AI Generations)"
+                    : "Developer Mode DISABLED (Free Tier Restored)"
                 );
               }
             }}

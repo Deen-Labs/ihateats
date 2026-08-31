@@ -17,7 +17,7 @@ export default function QuotaBadge({ quota, onUpgradeClick }: QuotaBadgeProps) {
         title="Developer Mode Active (Unlimited Generations)"
       >
         <i className="fa-solid fa-code text-cyan-400 text-xs animate-pulse" />
-        <span>🛠️ Dev Mode (Unlimited)</span>
+        <span>Dev Mode (Unlimited)</span>
       </button>
     );
   }
