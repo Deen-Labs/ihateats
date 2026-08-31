@@ -1,11 +1,11 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://ihateATS.deenlabs.tech"),
+  metadataBase: new URL("https://ihateats.deenlabs.tech"),
   title: {
-    default: "ihateATS â€” Free AI ATS Resume Builder & LaTeX Optimizer",
+    default: "ihateATS — Free AI ATS Resume Builder & LaTeX Optimizer",
     template: "%s | ihateATS",
   },
   description:
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   creator: "Deen Labs",
   publisher: "Deen Labs",
   alternates: {
-    canonical: "https://ihateATS.deenlabs.tech",
+    canonical: "https://ihateats.deenlabs.tech",
   },
   robots: {
     index: true,
@@ -40,17 +40,17 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "ihateATS â€” Free AI ATS Resume Builder & LaTeX Optimizer",
+    title: "ihateATS — Free AI ATS Resume Builder & LaTeX Optimizer",
     description:
       "Convert any rough text, LinkedIn profile, or draft into a recruiter-ready 1-page ATS resume in seconds. Free ATS scoring & PDF export.",
-    url: "https://ihateATS.deenlabs.tech",
+    url: "https://ihateats.deenlabs.tech",
     siteName: "ihateATS",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ihateATS â€” Free AI ATS Resume Builder & LaTeX Optimizer",
+    title: "ihateATS — Free AI ATS Resume Builder & LaTeX Optimizer",
     description:
       "Convert any rough text into a recruiter-ready ATS resume in seconds with AI. Free instant PDF export.",
     creator: "@deenlabs",
@@ -61,7 +61,7 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   name: "ihateATS",
-  url: "https://ihateATS.deenlabs.tech",
+  url: "https://ihateats.deenlabs.tech",
   description:
     "AI-powered ATS Resume Builder and LaTeX Optimizer that restructures raw candidate notes into recruiter-ready single-page PDF resumes.",
   applicationCategory: "BusinessApplication",
@@ -105,4 +105,3 @@ export default function RootLayout({
     </html>
   );
 }
-

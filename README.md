@@ -40,7 +40,7 @@ Powered by our proprietary **Lab Engine AI**, it ensures you never get auto-reje
 1. **Clone the repository:**
    `ash
    git clone https://github.com/Deen-Labs/ihateATS.git
-   cd ihateATS-web
+   cd ihateats-web
    `
 
 2. **Install dependencies:**
@@ -84,4 +84,3 @@ This will unlock unlimited Lab Engine AI generations for your session.
 ## License
 
 Designed and Engineered by [Deen Labs](https://github.com/Deen-Labs). All rights reserved.
-

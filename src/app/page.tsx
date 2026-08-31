@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,7 +21,7 @@ import { smoothScrollTo } from "@/lib/smoothScroll";
 function loadHistory(): HistoryEntry[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem("ihateATS_history");
+    const raw = localStorage.getItem("ihateats_history");
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -31,7 +31,7 @@ function loadHistory(): HistoryEntry[] {
 function saveHistory(history: HistoryEntry[]) {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem("ihateATS_history", JSON.stringify(history));
+    localStorage.setItem("ihateats_history", JSON.stringify(history));
   } catch {
     // localStorage full or unavailable
   }
@@ -213,7 +213,7 @@ export default function Home() {
   const handleClearHistory = useCallback(() => {
     setHistory([]);
     if (typeof window !== "undefined") {
-      localStorage.removeItem("ihateATS_history");
+      localStorage.removeItem("ihateats_history");
     }
   }, []);
 
@@ -435,10 +435,10 @@ export default function Home() {
               >
                 deenlabs.tech
               </a>{" "}
-              âš¡ Powered by Lab Engine
+              ⚡ Powered by Lab Engine
               <br />
-              No resume data is stored or logged Â· History is browser-session
-              only Â· Free to use
+              No resume data is stored or logged · History is browser-session
+              only · Free to use
             </footer>
           </main>
         </div>
@@ -492,4 +492,3 @@ export default function Home() {
     </div>
   );
 }
-

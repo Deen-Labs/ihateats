@@ -1,7 +1,7 @@
-﻿import { MetadataRoute } from "next";
+import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://ihateATS.deenlabs.tech";
+  const baseUrl = "https://ihateats.deenlabs.tech";
 
   return [
     {
@@ -12,4 +12,3 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 }
-
