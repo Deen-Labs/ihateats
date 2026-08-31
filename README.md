@@ -1,4 +1,4 @@
-﻿# ResumeLabs
+﻿# ihateATS
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
@@ -6,7 +6,7 @@
 ![React-PDF](https://img.shields.io/badge/React_PDF-FF4154?style=for-the-badge&logo=react&logoColor=white)
 ![Razorpay](https://img.shields.io/badge/Razorpay-02042B?style=for-the-badge&logo=razorpay&logoColor=white)
 
-ResumeLabs is an AI-powered, 100% free ATS resume builder. It takes your rough notes, old resumes, or LinkedIn profiles and transforms them into recruiter-tested, 1-page ATS-optimized resumes instantly. 
+ihateATS is an AI-powered, 100% free ATS resume builder. It takes your rough notes, old resumes, or LinkedIn profiles and transforms them into recruiter-tested, 1-page ATS-optimized resumes instantly. 
 
 Powered by our proprietary **Lab Engine AI**, it ensures you never get auto-rejected by Applicant Tracking Systems again.
 
@@ -39,8 +39,8 @@ Powered by our proprietary **Lab Engine AI**, it ensures you never get auto-reje
 
 1. **Clone the repository:**
    `ash
-   git clone https://github.com/Deen-Labs/ResumeLabs.git
-   cd resumelabs-web
+   git clone https://github.com/Deen-Labs/ihateATS.git
+   cd ihateATS-web
    `
 
 2. **Install dependencies:**
@@ -75,7 +75,7 @@ Powered by our proprietary **Lab Engine AI**, it ensures you never get auto-reje
 While testing locally or in production, you can bypass the Razorpay paywall and quota limits using **Developer Mode**:
 
 - **Keyboard Shortcut**: Press Ctrl + Shift + D (or Cmd + Shift + D on Mac).
-- **Easter Egg**: Click the "ResumeLabs" logo in the top-left navigation bar **5 times rapidly**.
+- **Easter Egg**: Click the "ihateATS" logo in the top-left navigation bar **5 times rapidly**.
 
 This will unlock unlimited Lab Engine AI generations for your session.
 
@@ -84,3 +84,4 @@ This will unlock unlimited Lab Engine AI generations for your session.
 ## License
 
 Designed and Engineered by [Deen Labs](https://github.com/Deen-Labs). All rights reserved.
+

@@ -1,4 +1,4 @@
-export interface QuotaState {
+﻿export interface QuotaState {
   remaining: number;
   limit: number;
   isPro: boolean;
@@ -7,8 +7,8 @@ export interface QuotaState {
   expiresAt?: string;
 }
 
-const STORAGE_KEY = "resumelabs_quota_v1";
-const DEV_MODE_KEY = "resumelabs_dev_mode";
+const STORAGE_KEY = "ihateATS_quota_v1";
+const DEV_MODE_KEY = "ihateATS_dev_mode";
 
 export function isDevMode(): boolean {
   if (typeof window === "undefined") return false;
@@ -75,7 +75,7 @@ export function getQuotaState(): QuotaState {
       limit: 99999,
       isPro: true,
       isDev: true,
-      planName: "🛠️ Dev Mode (Unlimited)",
+      planName: "ðŸ› ï¸ Dev Mode (Unlimited)",
     };
   }
 
@@ -191,3 +191,4 @@ export function activateProPlan(planId: string) {
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(proState));
 }
+

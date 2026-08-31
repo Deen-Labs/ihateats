@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,7 +21,7 @@ import { smoothScrollTo } from "@/lib/smoothScroll";
 function loadHistory(): HistoryEntry[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = localStorage.getItem("resumelabs_history");
+    const raw = localStorage.getItem("ihateATS_history");
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -31,7 +31,7 @@ function loadHistory(): HistoryEntry[] {
 function saveHistory(history: HistoryEntry[]) {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem("resumelabs_history", JSON.stringify(history));
+    localStorage.setItem("ihateATS_history", JSON.stringify(history));
   } catch {
     // localStorage full or unavailable
   }
@@ -213,7 +213,7 @@ export default function Home() {
   const handleClearHistory = useCallback(() => {
     setHistory([]);
     if (typeof window !== "undefined") {
-      localStorage.removeItem("resumelabs_history");
+      localStorage.removeItem("ihateATS_history");
     }
   }, []);
 
@@ -250,7 +250,7 @@ export default function Home() {
             className="text-xl font-bold text-white tracking-tight cursor-pointer select-none"
             title="Click 5 times to toggle Developer Mode"
           >
-            ResumeLabs
+            ihateATS
           </span>
           <span className="text-xs text-[#94a3b8] font-medium hidden sm:inline">
             ATS Resume Builder
@@ -426,7 +426,7 @@ export default function Home() {
             </AnimatePresence>
 
             <footer className="mt-8 pb-8 text-center text-xs text-[#64748b] leading-relaxed border-t border-[rgba(255,255,255,0.06)] pt-6">
-              ResumeLabs by{" "}
+              ihateATS by{" "}
               <a
                 href="https://deenlabs.tech"
                 target="_blank"
@@ -435,10 +435,10 @@ export default function Home() {
               >
                 deenlabs.tech
               </a>{" "}
-              ⚡ Powered by Lab Engine
+              âš¡ Powered by Lab Engine
               <br />
-              No resume data is stored or logged · History is browser-session
-              only · Free to use
+              No resume data is stored or logged Â· History is browser-session
+              only Â· Free to use
             </footer>
           </main>
         </div>
@@ -492,3 +492,4 @@ export default function Home() {
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -29,10 +29,10 @@ const B2C_PLANS: PlanOption[] = [
     popular: true,
     badge: "MOST POPULAR FOR JOB SEEKERS",
     features: [
-      "⚡ 7 Days Unlimited AI Resume Rewrites",
-      "📄 Jake's LaTeX 1-Page & 2-Page PDF Export",
-      "🎯 Full Interactive Form Editor & Session History",
-      "🚀 Zero Daily Quota Limits",
+      "âš¡ 7 Days Unlimited AI Resume Rewrites",
+      "ðŸ“„ Jake's LaTeX 1-Page & 2-Page PDF Export",
+      "ðŸŽ¯ Full Interactive Form Editor & Session History",
+      "ðŸš€ Zero Daily Quota Limits",
     ],
   },
   {
@@ -41,11 +41,11 @@ const B2C_PLANS: PlanOption[] = [
     price: 399,
     period: "per month",
     features: [
-      "⚡ Unlimited AI Resume Generations",
-      "🎯 Job Description Keyword Matcher",
-      "📑 Executive 2-Page & Single Page Fitting",
-      "📄 Export Raw LaTeX (.tex) Code",
-      "🚀 Priority AI Model Processing Pipeline",
+      "âš¡ Unlimited AI Resume Generations",
+      "ðŸŽ¯ Job Description Keyword Matcher",
+      "ðŸ“‘ Executive 2-Page & Single Page Fitting",
+      "ðŸ“„ Export Raw LaTeX (.tex) Code",
+      "ðŸš€ Priority AI Model Processing Pipeline",
     ],
   },
   {
@@ -55,10 +55,10 @@ const B2C_PLANS: PlanOption[] = [
     period: "One-Time Payment",
     badge: "BEST LONG TERM VALUE",
     features: [
-      "👑 Lifetime Unlimited Access",
-      "⚡ Never Pay Again & Zero Subscriptions",
-      "🎯 Full Recruiter Suite & Job Matcher",
-      "🚀 All Future AI Upgrades Included",
+      "ðŸ‘‘ Lifetime Unlimited Access",
+      "âš¡ Never Pay Again & Zero Subscriptions",
+      "ðŸŽ¯ Full Recruiter Suite & Job Matcher",
+      "ðŸš€ All Future AI Upgrades Included",
     ],
   },
 ];
@@ -70,10 +70,10 @@ const B2B_PLANS: PlanOption[] = [
     price: 1999,
     period: "per month",
     features: [
-      "📦 500 Candidate Resume Extractions / Month",
-      "📊 Bulk Candidate Data CSV / Excel Export",
-      "⚡ 2-Second Batch Processing Speed",
-      "💼 Email Support for Recruiting Teams",
+      "ðŸ“¦ 500 Candidate Resume Extractions / Month",
+      "ðŸ“Š Bulk Candidate Data CSV / Excel Export",
+      "âš¡ 2-Second Batch Processing Speed",
+      "ðŸ’¼ Email Support for Recruiting Teams",
     ],
   },
   {
@@ -84,11 +84,11 @@ const B2B_PLANS: PlanOption[] = [
     popular: true,
     badge: "RECOMMENDED FOR IT CONSULTANCIES",
     features: [
-      "📦 2,000 Candidate Resume Extractions / Month",
-      "🎯 AI Candidate-to-Job Match Ranking",
-      "🏢 White-Label Company Branded PDF Export",
-      "📊 Bulk CSV & Excel Database Exporter",
-      "🚀 Priority HR Support",
+      "ðŸ“¦ 2,000 Candidate Resume Extractions / Month",
+      "ðŸŽ¯ AI Candidate-to-Job Match Ranking",
+      "ðŸ¢ White-Label Company Branded PDF Export",
+      "ðŸ“Š Bulk CSV & Excel Database Exporter",
+      "ðŸš€ Priority HR Support",
     ],
   },
   {
@@ -97,11 +97,11 @@ const B2B_PLANS: PlanOption[] = [
     price: 14999,
     period: "per month",
     features: [
-      "🔌 10,000 Resume Extractions / Month",
-      "🔑 Developer REST API Key (x-api-key)",
+      "ðŸ”Œ 10,000 Resume Extractions / Month",
+      "ðŸ”‘ Developer REST API Key (x-api-key)",
       "Webhook & ATS Workday/Greenhouse Integration",
-      "🏢 Custom White-Label PDF Templates",
-      "📞 Dedicated Account Manager",
+      "ðŸ¢ Custom White-Label PDF Templates",
+      "ðŸ“ž Dedicated Account Manager",
     ],
   },
 ];
@@ -148,7 +148,7 @@ export default function PaywallModal({ isOpen, onClose, onSuccess }: PaywallModa
         setIsProcessing(false);
         onSuccess();
         onClose();
-        alert(`🎉 Sandbox Payment Successful! Activated ${activePlanObj.name}.`);
+        alert(`ðŸŽ‰ Sandbox Payment Successful! Activated ${activePlanObj.name}.`);
         return;
       }
 
@@ -160,8 +160,8 @@ export default function PaywallModal({ isOpen, onClose, onSuccess }: PaywallModa
         key: razorpayKey,
         amount: orderData.amount,
         currency: orderData.currency || "INR",
-        name: "ResumeLabs Pro",
-        description: `${activePlanObj.name} — ${activePlanObj.period}`,
+        name: "ihateATS Pro",
+        description: `${activePlanObj.name} â€” ${activePlanObj.period}`,
         order_id: orderData.id,
         theme: { color: "#7c3aed" },
         handler: async function (response: any) {
@@ -182,7 +182,7 @@ export default function PaywallModal({ isOpen, onClose, onSuccess }: PaywallModa
             activateProPlan(activePlanObj.id);
             onSuccess();
             onClose();
-            alert(`🎉 Payment Successful! Welcome to ${activePlanObj.name}.`);
+            alert(`ðŸŽ‰ Payment Successful! Welcome to ${activePlanObj.name}.`);
           } else {
             alert("Payment verification failed. Please contact support.");
           }
@@ -206,7 +206,7 @@ export default function PaywallModal({ isOpen, onClose, onSuccess }: PaywallModa
         setIsProcessing(false);
         onSuccess();
         onClose();
-        alert(`🎉 Payment Successful! Activated ${activePlanObj.name}.`);
+        alert(`ðŸŽ‰ Payment Successful! Activated ${activePlanObj.name}.`);
       }
     } catch (err) {
       alert(err instanceof Error ? err.message : "Checkout error occurred.");
@@ -249,7 +249,7 @@ export default function PaywallModal({ isOpen, onClose, onSuccess }: PaywallModa
           <div className="text-center mb-6">
             <span className="px-3.5 py-1 rounded-full bg-gradient-to-r from-[#06b6d4]/20 to-[#7c3aed]/20 border border-[#06b6d4]/30 text-[#38bdf8] text-xs font-bold uppercase tracking-wider inline-flex items-center gap-1.5 mb-3">
               <i className="fa-solid fa-[#06b6d4] fa-bolt text-xs" />
-              ResumeLabs Pro & B2B Suite
+              ihateATS Pro & B2B Suite
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-2">
               Unlock <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#06b6d4] via-[#a78bfa] to-[#7c3aed]">Unlimited AI Generations</span>
@@ -328,7 +328,7 @@ export default function PaywallModal({ isOpen, onClose, onSuccess }: PaywallModa
                     </div>
 
                     <div className="mb-4">
-                      <span className="text-3xl font-black text-white">₹{plan.price}</span>
+                      <span className="text-3xl font-black text-white">â‚¹{plan.price}</span>
                       <span className="text-slate-400 text-xs ml-1.5">{plan.period}</span>
                     </div>
 
@@ -351,7 +351,7 @@ export default function PaywallModal({ isOpen, onClose, onSuccess }: PaywallModa
             <div className="flex items-center gap-3 text-xs text-slate-400">
               <i className="fa-solid fa-shield-halved text-[#06b6d4] text-base" />
               <span>
-                Secured by <strong className="text-white">Razorpay</strong> · Instant UPI, GPay, Paytm, Cards
+                Secured by <strong className="text-white">Razorpay</strong> Â· Instant UPI, GPay, Paytm, Cards
               </span>
             </div>
 
@@ -371,7 +371,7 @@ export default function PaywallModal({ isOpen, onClose, onSuccess }: PaywallModa
               ) : (
                 <>
                   <i className="fa-solid fa-lock text-cyan-200" />
-                  <span>Unlock {activePlanObj.name} (₹{activePlanObj.price})</span>
+                  <span>Unlock {activePlanObj.name} (â‚¹{activePlanObj.price})</span>
                 </>
               )}
             </button>
@@ -381,3 +381,4 @@ export default function PaywallModal({ isOpen, onClose, onSuccess }: PaywallModa
     </AnimatePresence>
   );
 }
+

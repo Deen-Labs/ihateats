@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://resumelabs.deenlabs.tech"),
+  metadataBase: new URL("https://ihateATS.deenlabs.tech"),
   title: {
-    default: "ResumeLabs — Free AI ATS Resume Builder & LaTeX Optimizer",
-    template: "%s | ResumeLabs",
+    default: "ihateATS â€” Free AI ATS Resume Builder & LaTeX Optimizer",
+    template: "%s | ihateATS",
   },
   description:
     "Transform rough notes, old resumes, or LinkedIn profiles into recruiter-tested 1-page ATS resumes. Free instant ATS score analysis, LaTeX PDF export, and AI bullet rewriter powered by Lab Engine.",
@@ -19,14 +19,14 @@ export const metadata: Metadata = {
     "DevOps resume template",
     "free AI resume generator 2026",
     "job description keyword matcher",
-    "ResumeLabs",
+    "ihateATS",
     "Deen Labs",
   ],
   authors: [{ name: "Deen Labs", url: "https://deenlabs.tech" }],
   creator: "Deen Labs",
   publisher: "Deen Labs",
   alternates: {
-    canonical: "https://resumelabs.deenlabs.tech",
+    canonical: "https://ihateATS.deenlabs.tech",
   },
   robots: {
     index: true,
@@ -40,17 +40,17 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "ResumeLabs — Free AI ATS Resume Builder & LaTeX Optimizer",
+    title: "ihateATS â€” Free AI ATS Resume Builder & LaTeX Optimizer",
     description:
       "Convert any rough text, LinkedIn profile, or draft into a recruiter-ready 1-page ATS resume in seconds. Free ATS scoring & PDF export.",
-    url: "https://resumelabs.deenlabs.tech",
-    siteName: "ResumeLabs",
+    url: "https://ihateATS.deenlabs.tech",
+    siteName: "ihateATS",
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ResumeLabs — Free AI ATS Resume Builder & LaTeX Optimizer",
+    title: "ihateATS â€” Free AI ATS Resume Builder & LaTeX Optimizer",
     description:
       "Convert any rough text into a recruiter-ready ATS resume in seconds with AI. Free instant PDF export.",
     creator: "@deenlabs",
@@ -60,8 +60,8 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  name: "ResumeLabs",
-  url: "https://resumelabs.deenlabs.tech",
+  name: "ihateATS",
+  url: "https://ihateATS.deenlabs.tech",
   description:
     "AI-powered ATS Resume Builder and LaTeX Optimizer that restructures raw candidate notes into recruiter-ready single-page PDF resumes.",
   applicationCategory: "BusinessApplication",
@@ -105,3 +105,4 @@ export default function RootLayout({
     </html>
   );
 }
+

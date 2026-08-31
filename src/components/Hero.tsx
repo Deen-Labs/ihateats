@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 
@@ -34,18 +34,18 @@ export default function Hero({ onLoadSample }: HeroProps) {
       <motion.div variants={itemVariants} className="flex justify-center mb-6">
         <span className="px-4 py-1.5 rounded-full bg-gradient-to-r from-[#06b6d4]/15 to-[#7c3aed]/15 border border-[#06b6d4]/30 text-[#38bdf8] text-xs font-semibold tracking-wider uppercase shadow-[0_0_15px_rgba(6,182,212,0.2)] flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-[#06b6d4] animate-ping" />
-          ATS-Optimised · AI Powered · Free Forever
+          ATS-Optimised Â· AI Powered Â· Free Forever
         </span>
       </motion.div>
 
       <motion.h1 variants={itemVariants} className="text-4xl md:text-6xl font-black text-center mb-6 tracking-tight text-white">
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#06b6d4] via-[#a78bfa] to-[#7c3aed]">
-          ResumeLabs
+          ihateATS
         </span>
       </motion.h1>
 
       <motion.p variants={itemVariants} className="text-[#94a3b8] text-center text-lg md:text-xl max-w-3xl mx-auto mb-8 leading-relaxed font-normal">
-        Describe your background in any format — rough notes, a LinkedIn URL, or an old draft. Lab Engine restructures & optimizes it into a clean, recruiter-ready ATS resume.
+        Describe your background in any format â€” rough notes, a LinkedIn URL, or an old draft. Lab Engine restructures & optimizes it into a clean, recruiter-ready ATS resume.
       </motion.p>
 
       {onLoadSample && (
@@ -75,3 +75,4 @@ export default function Hero({ onLoadSample }: HeroProps) {
     </motion.div>
   );
 }
+
