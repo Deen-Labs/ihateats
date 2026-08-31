@@ -62,7 +62,9 @@ export default function Home() {
         e.preventDefault();
         const active = toggleDevMode();
         setQuota(getQuotaState());
-        alert(active ? "Developer Mode ENABLED (Unlimited AI Generations)" : "Developer Mode DISABLED (Free Tier Restored)");
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+          alert(active ? "Developer Mode ENABLED (Unlimited AI Generations)" : "Developer Mode DISABLED (Free Tier Restored)");
+        }
       }
     };
 
@@ -236,11 +238,13 @@ export default function Home() {
                 setLogoClickCount(0);
                 const active = toggleDevMode();
                 setQuota(getQuotaState());
-                alert(
-                  active
-                    ? "Developer Mode ENABLED (Unlimited AI Generations)"
-                    : "Developer Mode DISABLED (Free Tier Restored)"
-                );
+                if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+                  alert(
+                    active
+                      ? "Developer Mode ENABLED (Unlimited AI Generations)"
+                      : "Developer Mode DISABLED (Free Tier Restored)"
+                  );
+                }
               }
             }}
             className="text-xl font-bold text-white tracking-tight cursor-pointer select-none"

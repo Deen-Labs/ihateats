@@ -13,6 +13,12 @@ const DEV_MODE_KEY = "resumelabs_dev_mode";
 export function isDevMode(): boolean {
   if (typeof window === "undefined") return false;
   try {
+    // SECURITY: Strictly restrict Developer Mode to local environments
+    if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+      localStorage.removeItem(DEV_MODE_KEY); // Clean up if somehow set
+      return false;
+    }
+
     // Check URL parameter first (e.g. ?dev=true or ?dev=deenlabs)
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("dev")) {
@@ -30,6 +36,7 @@ export function isDevMode(): boolean {
 
 export function enableDevMode(): boolean {
   if (typeof window === "undefined") return false;
+  if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") return false;
   localStorage.setItem(DEV_MODE_KEY, "true");
   return true;
 }
@@ -41,6 +48,12 @@ export function disableDevMode(): boolean {
 }
 
 export function toggleDevMode(): boolean {
+  if (typeof window === "undefined") return false;
+  if (window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+    alert("Developer Mode is strictly disabled on production environments.");
+    return false;
+  }
+
   if (isDevMode()) {
     disableDevMode();
     return false;
