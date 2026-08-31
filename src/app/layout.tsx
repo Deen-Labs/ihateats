@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s | ResumeLabs",
   },
   description:
-    "Transform rough notes, old resumes, or LinkedIn profiles into recruiter-tested 1-page ATS resumes. Free instant ATS score analysis, LaTeX PDF export, and AI bullet rewriter powered by Google Gemini.",
+    "Transform rough notes, old resumes, or LinkedIn profiles into recruiter-tested 1-page ATS resumes. Free instant ATS score analysis, LaTeX PDF export, and AI bullet rewriter powered by Lab Engine.",
   keywords: [
     "free ATS resume builder",
     "AI resume optimizer",

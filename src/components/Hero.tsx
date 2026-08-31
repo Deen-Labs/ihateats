@@ -45,7 +45,7 @@ export default function Hero({ onLoadSample }: HeroProps) {
       </motion.h1>
 
       <motion.p variants={itemVariants} className="text-[#94a3b8] text-center text-lg md:text-xl max-w-3xl mx-auto mb-8 leading-relaxed font-normal">
-        Describe your background in any format — rough notes, a LinkedIn URL, or an old draft. Gemini restructures & optimizes it into a clean, recruiter-ready ATS resume.
+        Describe your background in any format — rough notes, a LinkedIn URL, or an old draft. Lab Engine restructures & optimizes it into a clean, recruiter-ready ATS resume.
       </motion.p>
 
       {onLoadSample && (

@@ -431,7 +431,7 @@ export default function Home() {
               >
                 deenlabs.tech
               </a>{" "}
-              · Powered by Google Gemini AI
+              ⚡ Powered by Lab Engine
               <br />
               No resume data is stored or logged · History is browser-session
               only · Free to use
