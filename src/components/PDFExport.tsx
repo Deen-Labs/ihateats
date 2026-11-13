@@ -23,7 +23,13 @@ export default function PDFExport({ candidateName }: PDFExportProps) {
     // Create isolated container at body level to eliminate blank pages from parent wrappers
     const container = document.createElement("div");
     container.id = "dedicated-print-container";
-    container.appendChild(printTarget.cloneNode(true));
+    const clone = printTarget.cloneNode(true) as HTMLElement;
+    clone.style.transform = "none";
+    clone.style.position = "static";
+    clone.style.width = "100%";
+    clone.style.height = "auto";
+    clone.style.boxShadow = "none";
+    container.appendChild(clone);
 
     document.body.appendChild(container);
     document.body.classList.add("printing-resume");

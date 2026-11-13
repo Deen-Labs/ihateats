@@ -12,7 +12,7 @@ interface HistorySidebarProps {
 
 export default function HistorySidebar({ history, onLoadEntry, onClearHistory }: HistorySidebarProps) {
   return (
-    <div className="bg-[#12121a]/80 backdrop-blur-md border border-white/5 rounded-2xl p-4 flex flex-col h-[80vh] overflow-hidden">
+    <div className="bg-[#12121a]/80 backdrop-blur-md border border-white/5 rounded-2xl p-4 flex flex-col h-full overflow-hidden">
       <div className="flex items-center justify-between mb-4 shrink-0">
         <h2 className="uppercase tracking-widest text-[10px] font-semibold text-slate-400">Session History</h2>
         {history.length > 0 && (

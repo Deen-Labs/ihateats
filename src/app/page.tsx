@@ -3,7 +3,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ResumeData, HistoryEntry } from "@/lib/schema";
-import Hero from "@/components/Hero";
 import ResumeInput from "@/components/ResumeInput";
 import JobMatcher from "@/components/JobMatcher";
 import HistorySidebar from "@/components/HistorySidebar";
@@ -51,6 +50,7 @@ export default function Home() {
   const [quota, setQuota] = useState<QuotaState>({ remaining: 2, limit: 2, isPro: false });
   const [showPaywall, setShowPaywall] = useState<boolean>(false);
   const [logoClickCount, setLogoClickCount] = useState(0);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   useEffect(() => {
     setHistory(loadHistory());
@@ -197,6 +197,59 @@ export default function Home() {
     setTimeout(() => smoothScrollTo(0, 500), 100);
   }, []);
 
+  const handleOpenBlankEditor = useCallback(() => {
+    setResumeData({
+      name: "Your Name",
+      email: "your.email@example.com",
+      phone: "+1 (555) 000-0000",
+      location: "City, State",
+      linkedin: "https://linkedin.com",
+      github: "https://github.com",
+      summary: "Results-driven professional with experience in technical execution, architecture, and cross-functional leadership.",
+      skills: [
+        {
+          category: "Technical Skills",
+          items: ["System Architecture", "Cloud Services", "API Integration"],
+        },
+      ],
+      experience: [
+        {
+          title: "Senior Role",
+          company: "Company Name",
+          location: "Location",
+          start_date: "2023",
+          end_date: "Present",
+          bullets: [
+            "Architected and deployed scalable systems, improving throughput by 25%.",
+            "Led cross-functional initiatives delivering critical milestones ahead of schedule.",
+          ],
+        },
+      ],
+      education: [
+        {
+          degree: "B.S. in Computer Science or Related Field",
+          institution: "University Name",
+          location: "Location",
+          graduation: "2022",
+          notes: "",
+        },
+      ],
+      certifications: [],
+      projects: [],
+      analysis: {
+        ats_score_before: 50,
+        ats_score_after: 88,
+        weak_phrases_upgraded: 0,
+        achievements_quantified: 2,
+        action_verbs_count: 2,
+        key_improvements: ["Draft initialized directly in Interactive Editor."],
+        missing_info: [],
+      },
+    });
+    setError(null);
+    setTimeout(() => smoothScrollTo(0, 500), 100);
+  }, []);
+
   const handleLoadEntry = useCallback(
     (index: number) => {
       const entry = history[index];
@@ -229,8 +282,8 @@ export default function Home() {
       </div>
 
       <nav className="relative z-10 glass-card mx-4 sm:mx-6 lg:mx-8 mt-4 px-6 py-4 flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-baseline gap-3">
-          <span
+        <div className="flex items-center gap-3">
+          <div
             onClick={() => {
               const nextCount = logoClickCount + 1;
               setLogoClickCount(nextCount);
@@ -247,17 +300,35 @@ export default function Home() {
                 }
               }
             }}
-            className="text-xl font-bold text-white tracking-tight cursor-pointer select-none"
+            className="flex items-center cursor-pointer select-none group"
             title="Click 5 times to toggle Developer Mode"
           >
-            ihateATS
-          </span>
+            <img 
+              src="/ihateats-logo.png" 
+              alt="ihateATS Logo" 
+              className="h-8 sm:h-9 w-auto object-contain drop-shadow-[0_0_12px_rgba(236,72,153,0.3)] group-hover:scale-105 transition-transform" 
+            />
+          </div>
           <span className="text-xs text-[#94a3b8] font-medium hidden sm:inline">
             ATS Resume Builder
           </span>
         </div>
 
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsHistoryOpen(true)}
+            className="px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-sm hover:border-violet-500/40"
+            title="Open Session History"
+          >
+            <i className="fa-solid fa-clock-rotate-left text-xs text-violet-400" />
+            <span>History</span>
+            {history.length > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full bg-violet-600/30 text-violet-300 text-[10px] font-bold border border-violet-500/30">
+                {history.length}
+              </span>
+            )}
+          </button>
+
           <QuotaBadge quota={quota} onUpgradeClick={() => setShowPaywall(true)} />
           {!quota.isPro && (
             <button
@@ -271,41 +342,66 @@ export default function Home() {
         </div>
       </nav>
 
-      <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex flex-col lg:flex-row gap-6">
-          <aside className="hidden lg:block w-72 xl:w-80 flex-shrink-0">
-            <HistorySidebar
-              history={history}
-              onLoadEntry={handleLoadEntry}
-              onClearHistory={handleClearHistory}
-            />
-          </aside>
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <main className="w-full">
+          <AnimatePresence mode="wait">
+            {!resumeData && (
+              <motion.div
+                key="input-phase"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="max-w-4xl mx-auto"
+              >
+                {/* Fast-Track Header */}
+                <div className="text-center mt-2 mb-8">
+                  <span className="px-3.5 py-1 rounded-full bg-gradient-to-r from-[#06b6d4]/15 to-[#7c3aed]/15 border border-[#06b6d4]/30 text-[#38bdf8] text-[11px] font-semibold tracking-wider uppercase inline-flex items-center gap-2 mb-4 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#06b6d4] animate-ping" />
+                    ATS-Optimised · AI Powered · Free Forever
+                  </span>
+                  <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
+                    Build a Recruiter-Ready{" "}
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#06b6d4] via-[#a78bfa] to-[#7c3aed]">
+                      ATS Resume
+                    </span>
+                  </h1>
+                  <p className="text-sm sm:text-base text-slate-400 mt-3 max-w-2xl mx-auto leading-relaxed">
+                    Paste your rough notes or LinkedIn, upload an existing resume, or jump straight into the Interactive Editor.
+                  </p>
 
-          <main className="flex-1 min-w-0">
-            <AnimatePresence mode="wait">
-              {!resumeData && (
-                <motion.div
-                  key="input-phase"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Hero onLoadSample={handleLoadSample} />
+                  <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
+                    <button
+                      onClick={handleLoadSample}
+                      className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#06b6d4] via-[#7c3aed] to-[#a78bfa] text-white font-bold text-xs sm:text-sm shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:shadow-[0_0_35px_rgba(6,182,212,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2 cursor-pointer"
+                    >
+                      <i className="fa-solid fa-bolt text-cyan-200" />
+                      <span>Load Sample Demo & Open Editor</span>
+                    </button>
 
-                  <div className="mt-6 glass-card p-6 sm:p-8">
-                    <ResumeInput
-                      value={rawText}
-                      onChange={setRawText}
-                      jobDescription={jobDescription}
-                      onJobDescriptionChange={setJobDescription}
-                      onGenerate={handleGenerate}
-                      isLoading={isLoading}
-                      onLoadSample={handleLoadSample}
-                      targetPages={targetPages}
-                      onTargetPagesChange={setTargetPages}
-                    />
+                    <button
+                      onClick={handleOpenBlankEditor}
+                      className="px-5 py-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-violet-500/40 text-slate-200 hover:text-white font-semibold text-xs sm:text-sm transition-all flex items-center gap-2 cursor-pointer"
+                    >
+                      <i className="fa-solid fa-pen-to-square text-violet-400" />
+                      <span>Start Blank in Editor &rarr;</span>
+                    </button>
                   </div>
+                </div>
+
+                <div className="glass-card p-6 sm:p-8 shadow-2xl">
+                  <ResumeInput
+                    value={rawText}
+                    onChange={setRawText}
+                    jobDescription={jobDescription}
+                    onJobDescriptionChange={setJobDescription}
+                    onGenerate={handleGenerate}
+                    isLoading={isLoading}
+                    onLoadSample={handleLoadSample}
+                    targetPages={targetPages}
+                    onTargetPagesChange={setTargetPages}
+                  />
+                </div>
 
                   {error && (
                     <motion.div
@@ -376,7 +472,7 @@ export default function Home() {
                             candidateName={resumeData.name || "Resume"}
                           />
                         </div>
-                        <div className="max-h-[750px] overflow-hidden rounded-xl bg-black/40 border border-white/10 p-2">
+                        <div className="h-[750px] max-h-[85vh] flex flex-col overflow-hidden rounded-xl bg-black/40 border border-white/10 p-2">
                           <ResumePreview data={resumeData} activeSection={activeSection} />
                         </div>
                       </div>
@@ -442,53 +538,69 @@ export default function Home() {
             </footer>
           </main>
         </div>
-      </div>
 
-      <div className="lg:hidden fixed bottom-4 right-4 z-50">
-        {history.length > 0 && (
-          <button
-            onClick={() => {
-              const el = document.getElementById("mobile-history");
-              if (el) el.classList.toggle("hidden");
-            }}
-            className="w-12 h-12 rounded-full bg-[#7c3aed] text-white shadow-lg flex items-center justify-center"
-          >
-            <i className="fa-solid fa-clock-rotate-left" />
-          </button>
-        )}
-      </div>
-      <div
-        id="mobile-history"
-        className="hidden lg:hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm p-4 overflow-y-auto"
-      >
-        <div className="max-w-sm mx-auto">
-          <button
-            onClick={() => {
-              const el = document.getElementById("mobile-history");
-              if (el) el.classList.add("hidden");
-            }}
-            className="mb-4 text-white text-sm"
-          >
-            <i className="fa-solid fa-xmark mr-2" />
-            Close
-          </button>
-          <HistorySidebar
-            history={history}
-            onLoadEntry={(i) => {
-              handleLoadEntry(i);
-              const el = document.getElementById("mobile-history");
-              if (el) el.classList.add("hidden");
-            }}
-            onClearHistory={handleClearHistory}
-          />
-        </div>
-      </div>
+        {/* Collapsible Session History Slide-Over Drawer */}
+        <AnimatePresence>
+          {isHistoryOpen && (
+            <div className="fixed inset-0 z-50 flex">
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsHistoryOpen(false)}
+                className="fixed inset-0 bg-black/70 backdrop-blur-sm"
+              />
 
-      <PaywallModal
-        isOpen={showPaywall}
-        onClose={() => setShowPaywall(false)}
-        onSuccess={() => setQuota(getQuotaState())}
-      />
-    </div>
-  );
-}
+              {/* Drawer Content */}
+              <motion.div
+                initial={{ x: "-100%" }}
+                animate={{ x: 0 }}
+                exit={{ x: "-100%" }}
+                transition={{ type: "spring", damping: 26, stiffness: 280 }}
+                className="relative z-10 w-80 sm:w-96 max-w-[85vw] h-full bg-[#0d0d14] border-r border-white/10 shadow-2xl flex flex-col p-4 sm:p-5"
+              >
+                <div className="flex items-center justify-between pb-3 mb-3 border-b border-white/10 shrink-0">
+                  <div className="flex items-center gap-2">
+                    <i className="fa-solid fa-clock-rotate-left text-violet-400 text-sm" />
+                    <span className="text-sm font-bold text-white tracking-wide">
+                      Session History
+                    </span>
+                    {history.length > 0 && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30">
+                        {history.length}
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setIsHistoryOpen(false)}
+                    className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                    title="Close History"
+                  >
+                    <i className="fa-solid fa-xmark text-sm" />
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-hidden">
+                  <HistorySidebar
+                    history={history}
+                    onLoadEntry={(i) => {
+                      handleLoadEntry(i);
+                      setIsHistoryOpen(false);
+                    }}
+                    onClearHistory={handleClearHistory}
+                  />
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        <PaywallModal
+          isOpen={showPaywall}
+          onClose={() => setShowPaywall(false)}
+          onSuccess={() => setQuota(getQuotaState())}
+        />
+      </div>
+    );
+  }

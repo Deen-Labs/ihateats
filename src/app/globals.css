@@ -459,6 +459,8 @@ textarea.input-dark {
     box-shadow: none !important;
     border: none !important;
     background: #ffffff !important;
+    transform: none !important;
+    position: static !important;
   }
 
   /* Prevent mid-item page splits across projects, experience, and headers */
