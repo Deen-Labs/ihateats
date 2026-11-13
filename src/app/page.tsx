@@ -4,7 +4,6 @@ import React, { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { ResumeData, HistoryEntry } from "@/lib/schema";
 import ResumeInput from "@/components/ResumeInput";
-import JobMatcher from "@/components/JobMatcher";
 import HistorySidebar from "@/components/HistorySidebar";
 import ResumePreview from "@/components/ResumePreview";
 import ResumeEditor from "@/components/ResumeEditor";
@@ -16,6 +15,62 @@ import { getQuotaState, consumeCredit, toggleDevMode, type QuotaState } from "@/
 
 import { SAMPLE_TECHNICAL_RAW_TEXT, SAMPLE_TECHNICAL_RESUME_DATA } from "@/lib/sampleData";
 import { smoothScrollTo } from "@/lib/smoothScroll";
+
+// Normalize AI response to fill missing fields with safe defaults
+function normalizeResumeData(raw: Record<string, unknown>): ResumeData {
+  const d = raw as Partial<ResumeData>;
+  return {
+    name: d.name || "",
+    email: d.email || "",
+    phone: d.phone || "",
+    linkedin: d.linkedin || "",
+    github: d.github || "",
+    location: d.location || "",
+    summary: d.summary || "",
+    skills: (d.skills || []).map(s => ({
+      category: s?.category || "",
+      items: Array.isArray(s?.items) ? s.items : [],
+    })),
+    experience: (d.experience || []).map(e => ({
+      title: e?.title || "",
+      company: e?.company || "",
+      location: e?.location || "",
+      start_date: e?.start_date || "",
+      end_date: e?.end_date || "",
+      bullets: Array.isArray(e?.bullets) ? e.bullets : [],
+    })),
+    education: (d.education || []).map(e => ({
+      degree: e?.degree || "",
+      institution: e?.institution || "",
+      location: e?.location || "",
+      graduation: e?.graduation || "",
+      notes: e?.notes || "",
+    })),
+    certifications: (d.certifications || []).map(c => ({
+      name: c?.name || "",
+      issuer: c?.issuer || "",
+      year: c?.year || "",
+    })),
+    projects: (d.projects || []).map(p => ({
+      name: p?.name || "",
+      description: p?.description || "",
+      tech: Array.isArray(p?.tech) ? p.tech : [],
+      url: p?.url || "",
+    })),
+    analysis: {
+      ats_score_before: d.analysis?.ats_score_before ?? 0,
+      ats_score_after: d.analysis?.ats_score_after ?? 0,
+      weak_phrases_upgraded: d.analysis?.weak_phrases_upgraded ?? 0,
+      achievements_quantified: d.analysis?.achievements_quantified ?? 0,
+      action_verbs_count: d.analysis?.action_verbs_count ?? 0,
+      key_improvements: Array.isArray(d.analysis?.key_improvements) ? d.analysis.key_improvements : [],
+      missing_info: Array.isArray(d.analysis?.missing_info) ? d.analysis.missing_info : [],
+      job_match_score: d.analysis?.job_match_score,
+      matched_keywords: Array.isArray(d.analysis?.matched_keywords) ? d.analysis.matched_keywords : undefined,
+      missing_target_keywords: Array.isArray(d.analysis?.missing_target_keywords) ? d.analysis.missing_target_keywords : undefined,
+    },
+  };
+}
 
 function loadHistory(): HistoryEntry[] {
   if (typeof window === "undefined") return [];
@@ -53,8 +108,24 @@ export default function Home() {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   useEffect(() => {
-    setHistory(loadHistory());
-    setQuota(getQuotaState());
+    const timer = setTimeout(() => {
+      setHistory(loadHistory());
+      setQuota(getQuotaState());
+
+      if (typeof window !== "undefined") {
+        try {
+          const savedDraft = localStorage.getItem("ihateats_active_draft");
+          if (savedDraft) {
+            const parsed = JSON.parse(savedDraft);
+            if (parsed && typeof parsed === "object" && parsed.name) {
+              setResumeData(normalizeResumeData(parsed));
+            }
+          }
+        } catch {
+          // localStorage draft invalid or corrupted
+        }
+      }
+    }, 0);
 
     // Keyboard Shortcut Ctrl + Shift + D (or Cmd + Shift + D) to toggle Dev Mode
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -69,7 +140,10 @@ export default function Home() {
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   useEffect(() => {
@@ -77,59 +151,6 @@ export default function Home() {
       saveHistory(history);
     }
   }, [history]);
-
-  // Normalize AI response to fill missing fields with safe defaults
-  function normalizeResumeData(raw: Record<string, unknown>): ResumeData {
-    const d = raw as Partial<ResumeData>;
-    return {
-      name: d.name || "",
-      email: d.email || "",
-      phone: d.phone || "",
-      linkedin: d.linkedin || "",
-      github: d.github || "",
-      location: d.location || "",
-      summary: d.summary || "",
-      skills: (d.skills || []).map(s => ({
-        category: s?.category || "",
-        items: Array.isArray(s?.items) ? s.items : [],
-      })),
-      experience: (d.experience || []).map(e => ({
-        title: e?.title || "",
-        company: e?.company || "",
-        location: e?.location || "",
-        start_date: e?.start_date || "",
-        end_date: e?.end_date || "",
-        bullets: Array.isArray(e?.bullets) ? e.bullets : [],
-      })),
-      education: (d.education || []).map(e => ({
-        degree: e?.degree || "",
-        institution: e?.institution || "",
-        location: e?.location || "",
-        graduation: e?.graduation || "",
-        notes: e?.notes || "",
-      })),
-      certifications: (d.certifications || []).map(c => ({
-        name: c?.name || "",
-        issuer: c?.issuer || "",
-        year: c?.year || "",
-      })),
-      projects: (d.projects || []).map(p => ({
-        name: p?.name || "",
-        description: p?.description || "",
-        tech: Array.isArray(p?.tech) ? p.tech : [],
-        url: p?.url || "",
-      })),
-      analysis: {
-        ats_score_before: d.analysis?.ats_score_before ?? 0,
-        ats_score_after: d.analysis?.ats_score_after ?? 0,
-        weak_phrases_upgraded: d.analysis?.weak_phrases_upgraded ?? 0,
-        achievements_quantified: d.analysis?.achievements_quantified ?? 0,
-        action_verbs_count: d.analysis?.action_verbs_count ?? 0,
-        key_improvements: Array.isArray(d.analysis?.key_improvements) ? d.analysis.key_improvements : [],
-        missing_info: Array.isArray(d.analysis?.missing_info) ? d.analysis.missing_info : [],
-      },
-    };
-  }
 
   const handleGenerate = useCallback(async () => {
     if (!rawText.trim()) {
@@ -162,6 +183,13 @@ export default function Home() {
       const raw = await res.json();
       const data = normalizeResumeData(raw);
       setResumeData(data);
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("ihateats_active_draft", JSON.stringify(data));
+        } catch {
+          // localStorage full
+        }
+      }
 
       consumeCredit();
       setQuota(getQuotaState());
@@ -193,12 +221,19 @@ export default function Home() {
   const handleLoadSample = useCallback(() => {
     setRawText(SAMPLE_TECHNICAL_RAW_TEXT);
     setResumeData(SAMPLE_TECHNICAL_RESUME_DATA);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("ihateats_active_draft", JSON.stringify(SAMPLE_TECHNICAL_RESUME_DATA));
+      } catch {
+        // localStorage full
+      }
+    }
     setError(null);
     setTimeout(() => smoothScrollTo(0, 500), 100);
   }, []);
 
   const handleOpenBlankEditor = useCallback(() => {
-    setResumeData({
+    const blankDraft: ResumeData = {
       name: "Your Name",
       email: "your.email@example.com",
       phone: "+1 (555) 000-0000",
@@ -245,7 +280,15 @@ export default function Home() {
         key_improvements: ["Draft initialized directly in Interactive Editor."],
         missing_info: [],
       },
-    });
+    };
+    setResumeData(blankDraft);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("ihateats_active_draft", JSON.stringify(blankDraft));
+      } catch {
+        // localStorage full
+      }
+    }
     setError(null);
     setTimeout(() => smoothScrollTo(0, 500), 100);
   }, []);
@@ -255,7 +298,15 @@ export default function Home() {
       const entry = history[index];
       if (entry) {
         setRawText(entry.raw_input);
-        setResumeData(normalizeResumeData(entry.resume_data as unknown as Record<string, unknown>));
+        const norm = normalizeResumeData(entry.resume_data as unknown as Record<string, unknown>);
+        setResumeData(norm);
+        if (typeof window !== "undefined") {
+          try {
+            localStorage.setItem("ihateats_active_draft", JSON.stringify(norm));
+          } catch {
+            // localStorage full
+          }
+        }
         setError(null);
         setTimeout(() => smoothScrollTo(0, 500), 100);
       }
@@ -272,6 +323,27 @@ export default function Home() {
 
   const handleResumeEdit = useCallback((updated: ResumeData) => {
     setResumeData(updated);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("ihateats_active_draft", JSON.stringify(updated));
+      } catch {
+        // localStorage full or unavailable
+      }
+    }
+    setHistory((prev) => {
+      if (prev.length === 0) return prev;
+      const last = prev[prev.length - 1];
+      if (last.name === updated.name || !last.name) {
+        const updatedHistory = [...prev];
+        updatedHistory[updatedHistory.length - 1] = {
+          ...last,
+          name: updated.name,
+          resume_data: updated,
+        };
+        return updatedHistory;
+      }
+      return prev;
+    });
   }, []);
 
   return (
@@ -440,6 +512,9 @@ export default function Home() {
                       onClick={() => {
                         setResumeData(null);
                         setError(null);
+                        if (typeof window !== "undefined") {
+                          localStorage.removeItem("ihateats_active_draft");
+                        }
                       }}
                       className="btn-secondary text-xs"
                     >
@@ -470,6 +545,7 @@ export default function Home() {
                           </h3>
                           <PDFExport
                             candidateName={resumeData.name || "Resume"}
+                            data={resumeData}
                           />
                         </div>
                         <div className="h-[750px] max-h-[85vh] flex flex-col overflow-hidden rounded-xl bg-black/40 border border-white/10 p-2">

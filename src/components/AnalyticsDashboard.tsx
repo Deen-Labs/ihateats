@@ -107,15 +107,16 @@ export default function AnalyticsDashboard({ data, rawText }: AnalyticsDashboard
                 Matched Target Keywords ({analysis.matched_keywords?.length || 0})
               </span>
               <div className="flex flex-wrap gap-1.5 pt-1">
-                {(analysis.matched_keywords && analysis.matched_keywords.length > 0
-                  ? analysis.matched_keywords
-                  : ["Cloud Architecture", "Docker", "Kubernetes", "CI/CD Pipeline", "Infrastructure as Code"]
-                ).map((kw, i) => (
-                  <span key={i} className="px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium flex items-center gap-1">
-                    <i className="fa-solid fa-check text-[10px] text-emerald-400" />
-                    {kw}
-                  </span>
-                ))}
+                {analysis.matched_keywords && analysis.matched_keywords.length > 0 ? (
+                  analysis.matched_keywords.map((kw, i) => (
+                    <span key={i} className="px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium flex items-center gap-1">
+                      <i className="fa-solid fa-check text-[10px] text-emerald-400" />
+                      {kw}
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-400 italic py-1">No specific keywords matched yet.</p>
+                )}
               </div>
             </div>
 
@@ -126,15 +127,16 @@ export default function AnalyticsDashboard({ data, rawText }: AnalyticsDashboard
                 Recommended Skills to Highlight ({analysis.missing_target_keywords?.length || 0})
               </span>
               <div className="flex flex-wrap gap-1.5 pt-1">
-                {(analysis.missing_target_keywords && analysis.missing_target_keywords.length > 0
-                  ? analysis.missing_target_keywords
-                  : ["Prometheus", "Helm", "Distributed Tracing"]
-                ).map((kw, i) => (
-                  <span key={i} className="px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium flex items-center gap-1">
-                    <i className="fa-solid fa-plus text-[10px] text-amber-400" />
-                    {kw}
-                  </span>
-                ))}
+                {analysis.missing_target_keywords && analysis.missing_target_keywords.length > 0 ? (
+                  analysis.missing_target_keywords.map((kw, i) => (
+                    <span key={i} className="px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium flex items-center gap-1">
+                      <i className="fa-solid fa-plus text-[10px] text-amber-400" />
+                      {kw}
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-400 italic py-1">All primary target keywords are well covered!</p>
+                )}
               </div>
             </div>
           </div>

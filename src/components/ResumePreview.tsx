@@ -7,6 +7,22 @@ interface ResumePreviewProps {
   activeSection?: string;
 }
 
+function safeUrl(url?: string): string | null {
+  if (!url) return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+  try {
+    const withProto = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+    const parsed = new URL(withProto);
+    if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+      return parsed.href;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export default function ResumePreview({ data, activeSection }: ResumePreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const targetRef = useRef<HTMLDivElement>(null);
@@ -97,6 +113,9 @@ export default function ResumePreview({ data, activeSection }: ResumePreviewProp
   const scale = zoom / 100;
   const scaledWidth = Math.round(paperWidth * scale);
   const scaledHeight = Math.round(Math.max(paperHeight, contentHeight) * scale);
+
+  const safeLinkedin = safeUrl(data.linkedin);
+  const safeGithub = safeUrl(data.github);
 
   return (
     <div className="flex flex-col w-full h-full min-h-[500px]">
@@ -234,7 +253,9 @@ export default function ResumePreview({ data, activeSection }: ResumePreviewProp
           <div 
             ref={targetRef}
             id="resume-print-target"
-            className="bg-white text-black shadow-2xl transition-all duration-300"
+            data-paper-format={paperFormat}
+            data-density={density}
+            className="bg-white text-black shadow-2xl transition-all duration-300 relative"
             style={{
               position: "absolute",
               top: 0,
@@ -249,6 +270,18 @@ export default function ResumePreview({ data, activeSection }: ResumePreviewProp
               fontSize: density === "compact" ? "9.2pt" : "11pt"
             }}
           >
+            {/* Visual Non-Printing Page 1 Cutoff Indicator */}
+            {contentHeight > paperHeight && (
+              <div
+                className="print:hidden pointer-events-none absolute left-0 right-0 border-b-2 border-dashed border-rose-500/70 flex justify-end pr-2 z-20"
+                style={{ top: `${paperHeight}px` }}
+              >
+                <span className="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded -translate-y-1/2 shadow-sm">
+                  Page 1 Cutoff — Switch to Strict 1-Page or trim bullets
+                </span>
+              </div>
+            )}
+
             {/* Header */}
             <div className={`text-center p-1 rounded transition-all duration-300 ${density === 'compact' ? 'mb-1.5' : 'mb-3'} ${activeSection === 'contact' ? 'ring-2 ring-[#06b6d4] bg-cyan-50/30' : ''}`}>
               <h1 className="text-3xl font-bold uppercase mb-1" style={{ fontVariant: "small-caps" }}>{data.name}</h1>
@@ -270,19 +303,19 @@ export default function ResumePreview({ data, activeSection }: ResumePreviewProp
                     <span className="flex items-center gap-1"><MapPin size={12} /> {data.location}</span>
                   </>
                 )}
-                {data.linkedin && (
+                {safeLinkedin && (
                   <>
                     <span>|</span>
-                    <a href={data.linkedin} target="_blank" rel="noreferrer" className="hover:underline flex items-center gap-1">
-                      <i className="fa-brands fa-linkedin text-[12px]" /> {data.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')}
+                    <a href={safeLinkedin} target="_blank" rel="noreferrer" className="hover:underline flex items-center gap-1">
+                      <i className="fa-brands fa-linkedin text-[12px]" /> {data.linkedin?.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')}
                     </a>
                   </>
                 )}
-                {data.github && (
+                {safeGithub && (
                   <>
                     <span>|</span>
-                    <a href={data.github} target="_blank" rel="noreferrer" className="hover:underline flex items-center gap-1">
-                      <i className="fa-brands fa-github text-[12px]" /> {data.github.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
+                    <a href={safeGithub} target="_blank" rel="noreferrer" className="hover:underline flex items-center gap-1">
+                      <i className="fa-brands fa-github text-[12px]" /> {data.github?.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
                     </a>
                   </>
                 )}
@@ -343,18 +376,25 @@ export default function ResumePreview({ data, activeSection }: ResumePreviewProp
               <div className={`p-1 rounded transition-all duration-300 ${density === 'compact' ? 'mb-1.5' : 'mb-3'} ${activeSection === 'projects' ? 'ring-2 ring-[#06b6d4] bg-cyan-50/30' : ''}`}>
                 <h2 className="resume-section-header text-lg font-bold uppercase border-b border-black mb-1" style={{ fontVariant: "small-caps" }}>Projects</h2>
                 <div className={`flex flex-col ${density === 'compact' ? 'gap-1.5' : 'gap-2.5'}`}>
-                  {data.projects.map((proj, idx) => (
-                    <div key={idx} className="resume-project-item break-inside-avoid">
-                      <div className="font-bold">
-                        {proj.name}
-                        {proj.url && <a href={proj.url} target="_blank" rel="noreferrer" className="font-normal ml-2 hover:underline text-blue-700">[{proj.url}]</a>}
+                  {data.projects.map((proj, idx) => {
+                    const safeProjUrl = safeUrl(proj.url);
+                    return (
+                      <div key={idx} className="resume-project-item break-inside-avoid">
+                        <div className="font-bold">
+                          {proj.name}
+                          {safeProjUrl && (
+                            <a href={safeProjUrl} target="_blank" rel="noreferrer" className="font-normal ml-2 hover:underline text-blue-700">
+                              [{proj.url}]
+                            </a>
+                          )}
+                        </div>
+                        <p className="text-justify my-0.5">{proj.description}</p>
+                        {proj.tech && proj.tech.length > 0 && (
+                          <p><span className="font-bold italic">Technologies:</span> {(proj.tech || []).join(", ")}</p>
+                        )}
                       </div>
-                      <p className="text-justify my-0.5">{proj.description}</p>
-                      {proj.tech && proj.tech.length > 0 && (
-                        <p><span className="font-bold italic">Technologies:</span> {(proj.tech || []).join(", ")}</p>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -397,27 +437,6 @@ export default function ResumePreview({ data, activeSection }: ResumePreviewProp
           </div>
         </div>
       </div>
-      
-      <style dangerouslySetInnerHTML={{__html: `
-        @media print {
-          body * {
-            visibility: hidden;
-          }
-          #resume-print-target, #resume-print-target * {
-            visibility: visible;
-          }
-          #resume-print-target {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: auto;
-            box-shadow: none !important;
-            padding: 0.5in !important;
-            margin: 0 !important;
-          }
-        }
-      `}} />
     </div>
   );
 }

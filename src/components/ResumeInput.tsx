@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef } from "react";
 
 interface ResumeInputProps {
@@ -47,6 +46,7 @@ export default function ResumeInput({
   const [fileName, setFileName] = useState<string | null>(null);
   const [extractedInfo, setExtractedInfo] = useState<{ pages: number; wordCount: number } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isExtractedTextExpanded, setIsExtractedTextExpanded] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const processFile = async (file: File) => {
@@ -254,25 +254,57 @@ export default function ResumeInput({
             </div>
           ) : activeTab === "upload" && fileName ? (
             <div className="w-full bg-[#12121a]/90 border border-emerald-500/30 rounded-2xl p-5 shadow-xl flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
                 <div className="flex items-center gap-3">
                   <i className="fa-solid fa-file-pdf text-xl text-emerald-400" />
                   <div>
                     <h5 className="text-white font-bold text-xs">{fileName}</h5>
-                    <p className="text-slate-400 text-[11px]">{extractedInfo?.wordCount} Words parsed</p>
+                    <p className="text-slate-400 text-[11px]">
+                      {extractedInfo?.pages ? `${extractedInfo.pages} Page${extractedInfo.pages > 1 ? "s" : ""} · ` : ""}
+                      {value.trim().split(/\s+/).filter(Boolean).length} Words parsed
+                    </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => {
-                    setFileName(null);
-                    setExtractedInfo(null);
-                    onChange("");
-                  }}
-                  className="text-xs text-rose-400 hover:text-rose-300"
-                >
-                  Clear File
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsExtractedTextExpanded((prev) => !prev)}
+                    className="text-xs text-cyan-400 hover:text-cyan-300 font-medium px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 transition-colors flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <span>{isExtractedTextExpanded ? "Hide Extracted Text" : "Inspect / Edit Extracted Text"}</span>
+                    <i className={`fa-solid fa-chevron-${isExtractedTextExpanded ? "up" : "down"} text-[10px]`} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFileName(null);
+                      setExtractedInfo(null);
+                      onChange("");
+                    }}
+                    className="text-xs text-rose-400 hover:text-rose-300 px-2 py-1 rounded hover:bg-rose-500/10 transition-colors cursor-pointer"
+                  >
+                    Clear File
+                  </button>
+                </div>
               </div>
+
+              {isExtractedTextExpanded && (
+                <div className="pt-2 border-t border-white/10 flex flex-col gap-2">
+                  <div className="flex justify-between items-center text-[11px] text-slate-400">
+                    <span>Inspect and clean up any PDF parsing quirks before generating:</span>
+                    <span className="font-mono text-cyan-400">
+                      {value.length.toLocaleString()} characters
+                    </span>
+                  </div>
+                  <textarea
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    placeholder="Extracted PDF text will appear here. Edit or trim text as needed before generating..."
+                    rows={8}
+                    className="w-full p-3.5 rounded-xl bg-[#0a0a0f] text-xs text-slate-200 border border-white/10 placeholder:text-slate-600 focus:outline-none focus:border-[#06b6d4] focus:ring-1 focus:ring-[#06b6d4]/50 transition-all resize-y custom-scrollbar font-mono leading-relaxed"
+                  />
+                </div>
+              )}
             </div>
           ) : (
             <textarea

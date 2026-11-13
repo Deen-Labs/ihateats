@@ -106,9 +106,31 @@ const B2B_PLANS: PlanOption[] = [
   },
 ];
 
+interface RazorpaySuccessResponse {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}
+
+interface RazorpayOptions {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  order_id: string;
+  theme?: { color: string };
+  handler: (response: RazorpaySuccessResponse) => void | Promise<void>;
+  modal?: { ondismiss?: () => void };
+}
+
+interface RazorpayInstance {
+  open: () => void;
+}
+
 declare global {
   interface Window {
-    Razorpay: any;
+    Razorpay: new (options: RazorpayOptions) => RazorpayInstance;
   }
 }
 
@@ -123,6 +145,11 @@ export default function PaywallModal({ isOpen, onClose, onSuccess }: PaywallModa
   const activePlanObj = currentPlans.find((p) => p.id === selectedPlan) || currentPlans[0];
 
   const handleCheckout = async () => {
+    if (tab === "b2b" || activePlanObj.id.startsWith("b2b_")) {
+      window.location.href = "mailto:support@deenlabs.tech?subject=ihateATS%20B2B%20Inquiry";
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
@@ -164,7 +191,7 @@ export default function PaywallModal({ isOpen, onClose, onSuccess }: PaywallModa
         description: `${activePlanObj.name} — ${activePlanObj.period}`,
         order_id: orderData.id,
         theme: { color: "#7c3aed" },
-        handler: async function (response: any) {
+        handler: async function (response: RazorpaySuccessResponse) {
           // Verify signature on server
           const verifyRes = await fetch("/api/razorpay/verify-payment", {
             method: "POST",
@@ -351,30 +378,44 @@ export default function PaywallModal({ isOpen, onClose, onSuccess }: PaywallModa
             <div className="flex items-center gap-3 text-xs text-slate-400">
               <i className="fa-solid fa-shield-halved text-[#06b6d4] text-base" />
               <span>
-                Secured by <strong className="text-white">Razorpay</strong> · Instant UPI, GPay, Paytm, Cards
+                {tab === "b2b" ? (
+                  <>Custom corporate solutions & Dedicated SLA support</>
+                ) : (
+                  <>Secured by <strong className="text-white">Razorpay</strong> · Instant UPI, GPay, Paytm, Cards</>
+                )}
               </span>
             </div>
 
-            <button
-              onClick={handleCheckout}
-              disabled={isProcessing}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-[#06b6d4] via-[#7c3aed] to-[#a78bfa] text-white font-bold text-base shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:shadow-[0_0_35px_rgba(6,182,212,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
-            >
-              {isProcessing ? (
-                <>
-                  <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  <span>Processing Razorpay Checkout...</span>
-                </>
-              ) : (
-                <>
-                  <i className="fa-solid fa-lock text-cyan-200" />
-                  <span>Unlock {activePlanObj.name} (₹{activePlanObj.price})</span>
-                </>
-              )}
-            </button>
+            {tab === "b2b" ? (
+              <a
+                href="mailto:support@deenlabs.tech?subject=ihateATS%20B2B%20Inquiry"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-[#06b6d4] via-[#7c3aed] to-[#a78bfa] text-white font-bold text-base shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:shadow-[0_0_35px_rgba(6,182,212,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer text-center"
+              >
+                <i className="fa-solid fa-envelope text-cyan-200" />
+                <span>Contact Sales (Coming Soon)</span>
+              </a>
+            ) : (
+              <button
+                onClick={handleCheckout}
+                disabled={isProcessing}
+                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-[#06b6d4] via-[#7c3aed] to-[#a78bfa] text-white font-bold text-base shadow-[0_0_25px_rgba(6,182,212,0.4)] hover:shadow-[0_0_35px_rgba(6,182,212,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                {isProcessing ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    <span>Processing Razorpay Checkout...</span>
+                  </>
+                ) : (
+                  <>
+                    <i className="fa-solid fa-lock text-cyan-200" />
+                    <span>Unlock {activePlanObj.name} (₹{activePlanObj.price})</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </motion.div>
       </div>

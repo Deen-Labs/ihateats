@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
+import { PLAN_PRICES } from "@/lib/plans";
 
 function cleanKey(val?: string): string {
   if (!val) return "";
@@ -8,7 +9,18 @@ function cleanKey(val?: string): string {
 
 export async function POST(req: Request) {
   try {
-    const { planId, amount } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const { planId } = body;
+
+    if (!planId || typeof planId !== "string" || !PLAN_PRICES[planId]) {
+      return NextResponse.json(
+        { error: "Invalid or missing planId." },
+        { status: 400 }
+      );
+    }
+
+    const plan = PLAN_PRICES[planId];
+    const amountInPaise = plan.priceInr * 100;
 
     const rawKeyId = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
     const rawKeySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -17,11 +29,18 @@ export async function POST(req: Request) {
     const keySecret = cleanKey(rawKeySecret);
 
     if (!keyId || !keySecret) {
-      // Return sandbox order ID for immediate testing if Razorpay keys aren't added yet
+      if (process.env.NODE_ENV === "production") {
+        return NextResponse.json(
+          { error: "Razorpay payment keys are not configured on the server." },
+          { status: 500 }
+        );
+      }
+
+      // Sandbox order fallback ONLY in development / test environments when keys are missing
       return NextResponse.json({
         id: `order_sandbox_${Date.now()}`,
         currency: "INR",
-        amount: (amount || 199) * 100,
+        amount: amountInPaise,
         status: "created",
         isSandbox: true,
       });
@@ -33,10 +52,10 @@ export async function POST(req: Request) {
     });
 
     const order = await razorpay.orders.create({
-      amount: amount * 100, // Amount in paise
+      amount: amountInPaise,
       currency: "INR",
       receipt: `receipt_${planId}_${Date.now()}`,
-      notes: { planId },
+      notes: { planId, planName: plan.name },
     });
 
     return NextResponse.json(order);

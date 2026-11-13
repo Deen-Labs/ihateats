@@ -1,4 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
+import { z } from "zod";
 import { ResumeSchema, type ResumeData } from "./schema";
 
 const SYSTEM_PROMPT = `You are a senior technical recruiter and professional resume strategist with 15+ years of
@@ -27,7 +28,7 @@ ATS SCORING FORMULA (100 POINTS TOTAL):
 - Calculate 'ats_score_before' based on the raw input text's original quality (typically 30-65).
 - Calculate 'ats_score_after' based on your optimized rewrite (MUST be between 90 and 98).
 
-IMPORTANT: Return ONLY valid JSON matching the schema format below.`;
+IMPORTANT: Return valid structured JSON matching the provided JSON schema.`;
 
 function buildPrompt(rawText: string, jobDescription?: string, targetPages: number = 1): string {
   let prompt = `CANDIDATE INPUT TEXT:\n${rawText}`;
@@ -50,70 +51,13 @@ function buildPrompt(rawText: string, jobDescription?: string, targetPages: numb
   return prompt;
 }
 
-const MODELS = [
-  "gemini-3.6-flash",
-  "gemini-3.5-flash-lite",
-  "gemini-2.5-flash"
+export const MODELS = [
+  "gemini-2.5-flash",
+  "gemini-2.5-pro",
+  "gemini-2.0-flash",
 ];
 
-const JSON_TEMPLATE = `{
-  "name": "<Full Name from input>",
-  "email": "<Email address from input>",
-  "phone": "<Phone number with exact country code from input>",
-  "linkedin": "<LinkedIn URL from input>",
-  "github": "<GitHub URL from input>",
-  "location": "<City, State, Country from input>",
-  "summary": "<2-3 sentence summary based strictly on candidate input>",
-  "skills": [
-    { "category": "<Category Name>", "items": ["<Skill 1>", "<Skill 2>"] }
-  ],
-  "experience": [
-    {
-      "title": "<Exact Job Title>",
-      "company": "<Exact Company Name>",
-      "location": "<Exact Location>",
-      "start_date": "<Start Date>",
-      "end_date": "<End Date or Present>",
-      "bullets": [
-        "<Action verb bullet point based on candidate achievements>"
-      ]
-    }
-  ],
-  "education": [
-    {
-      "degree": "<Degree Name>",
-      "institution": "<School / University Name>",
-      "location": "<Location>",
-      "graduation": "<Year>",
-      "notes": "<GPA or notes if provided>"
-    }
-  ],
-  "certifications": [
-    { "name": "<Certification Name>", "issuer": "<Issuing Org>", "year": "<Year>" }
-  ],
-  "projects": [
-    {
-      "name": "<Project Name>",
-      "description": "<One line summary>",
-      "tech": ["<Tech 1>", "<Tech 2>"],
-      "url": "<URL if provided>"
-    }
-  ],
-  "analysis": {
-    "ats_score_before": 55,
-    "ats_score_after": 92,
-    "weak_phrases_upgraded": 4,
-    "achievements_quantified": 3,
-    "action_verbs_count": 10,
-    "key_improvements": ["Upgraded weak verbs", "Formatted ATS structure"],
-    "missing_info": ["Consider adding portfolio link"],
-    "job_match_score": 88,
-    "matched_keywords": ["Docker", "Kubernetes", "Terraform", "CI/CD"],
-    "missing_target_keywords": ["Prometheus", "Helm"]
-  }
-}`;
-
-function getApiKey(): string {
+export function getApiKey(): string {
   const keys = [
     process.env.GEMINI_API_KEY,
     process.env.GEMINI_API_KEY_1,
@@ -153,11 +97,13 @@ export async function generateResume(
       try {
         const response = await ai.models.generateContent({
           model: modelName,
-          contents: prompt + "\n\nCRITICAL REQUIREMENT: Output MUST be raw valid JSON matching this exact structure template (DO NOT return empty fields if data can be inferred from input):\n" + JSON_TEMPLATE,
+          contents: prompt,
           config: {
             systemInstruction: SYSTEM_PROMPT,
             temperature: 0.3,
             responseMimeType: "application/json",
+            // Native Zod v4 JSON Schema structured output
+            responseJsonSchema: z.toJSONSchema(ResumeSchema),
           },
         });
 
@@ -171,13 +117,20 @@ export async function generateResume(
           .trim();
 
         const parsed = JSON.parse(cleanText);
-        return parsed as ResumeData;
+        const validated = ResumeSchema.parse(parsed);
+        return validated;
       } catch (err) {
         lastError = err instanceof Error ? err : new Error(String(err));
         console.warn(`${modelName} attempt ${attempt + 1} failed: ${lastError.message}`);
+        if (
+          lastError.message.includes("404") ||
+          lastError.message.includes("NOT_FOUND")
+        ) {
+          break;
+        }
         // If rate limited or service unavailable, pause before retry
         const backoffMs = (attempt + 1) * 2000;
-        await new Promise(r => setTimeout(r, backoffMs));
+        await new Promise((r) => setTimeout(r, backoffMs));
       }
     }
   }

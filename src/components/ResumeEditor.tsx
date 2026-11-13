@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ResumeData, ExperienceItem, SkillCategory, CertificationItem, EducationItem, ProjectItem } from "@/lib/schema";
 
@@ -94,16 +94,17 @@ function CommaSeparatedInput({
   section?: string;
   onFocusSection?: (section: string) => void;
 }) {
-  const initialString = (items || []).join(", ");
-  const [text, setText] = useState(initialString);
+  const [text, setText] = useState(() => (items || []).join(", "));
+  const [prevItems, setPrevItems] = useState(items);
 
   // Sync if external items array changes completely (e.g. sample load or AI regenerate)
-  useEffect(() => {
+  if (items !== prevItems) {
+    setPrevItems(items);
     const currentJoined = (items || []).join(", ");
     if (currentJoined !== text.split(",").map(s => s.trim()).filter(Boolean).join(", ")) {
       setText(currentJoined);
     }
-  }, [items]);
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -130,6 +131,7 @@ function CommaSeparatedInput({
 
 export default function ResumeEditor({ data, onChange, onFocusSection }: ResumeEditorProps) {
   const [activeTab, setActiveTab] = useState(0);
+  const [rewritingKey, setRewritingKey] = useState<string | null>(null);
 
   const updateData = (updates: Partial<ResumeData>) => {
     onChange({ ...data, ...updates });
@@ -137,6 +139,47 @@ export default function ResumeEditor({ data, onChange, onFocusSection }: ResumeE
 
   const handleFocus = (section: string) => {
     if (onFocusSection) onFocusSection(section);
+  };
+
+  const handleRewriteBullet = async (
+    expIdx: number,
+    bulletIdx: number,
+    currentBullet: string,
+    title?: string,
+    company?: string
+  ) => {
+    if (!currentBullet.trim()) return;
+    const key = `${expIdx}-${bulletIdx}`;
+    setRewritingKey(key);
+    try {
+      const res = await fetch("/api/rewrite-bullet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bullet: currentBullet,
+          roleTitle: title,
+          company: company,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || "Failed to rewrite bullet.");
+      }
+
+      const json = await res.json();
+      if (json.rewritten) {
+        const newExp = [...data.experience];
+        const newBullets = [...(newExp[expIdx].bullets || [])];
+        newBullets[bulletIdx] = json.rewritten;
+        newExp[expIdx] = { ...newExp[expIdx], bullets: newBullets };
+        updateData({ experience: newExp });
+      }
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Error rewriting bullet.");
+    } finally {
+      setRewritingKey(null);
+    }
   };
 
   const renderContactInfo = () => (
@@ -294,6 +337,28 @@ export default function ResumeEditor({ data, onChange, onFocusSection }: ResumeE
                   }}
                   className="flex-1 bg-[#0a0a0f] border border-white/10 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-[#06b6d4] transition-all"
                 />
+                <button
+                  type="button"
+                  disabled={rewritingKey === `${i}-${bIdx}` || !bullet.trim()}
+                  onClick={() => handleRewriteBullet(i, bIdx, bullet, exp.title, exp.company)}
+                  className="shrink-0 px-2.5 py-1.5 rounded-lg text-[10px] font-bold text-cyan-300 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 hover:border-cyan-400/50 transition-all flex items-center gap-1 disabled:opacity-40 cursor-pointer shadow-sm select-none"
+                  title="Rewrite bullet with Google XYZ formula (Action Verb + Quantified Impact)"
+                >
+                  {rewritingKey === `${i}-${bIdx}` ? (
+                    <>
+                      <svg className="animate-spin h-3 w-3 text-cyan-300" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      <span>Rewriting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-amber-300">✨</span>
+                      <span>AI Rewrite</span>
+                    </>
+                  )}
+                </button>
                 <div className="flex items-center gap-1">
                   <div className="flex flex-col gap-0 border border-white/5 rounded overflow-hidden">
                     <button
