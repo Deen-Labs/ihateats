@@ -69,8 +69,8 @@ Engineered with strict zero-hallucination guardrails, native Zod v4 structured s
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Deen-Labs/ResumeLabs.git
-   cd ResumeLabs
+   git clone https://github.com/Deen-Labs/ihateats.git
+   cd ihateats
    ```
 
 2. **Install dependencies:**
